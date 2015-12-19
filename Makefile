@@ -1,7 +1,12 @@
 VERSION = 3
 PATCHLEVEL = 10
+<<<<<<< HEAD
 SUBLEVEL = 96
 EXTRAVERSION =
+=======
+SUBLEVEL = 20
+EXTRAVERSION = _FlareM_v5
+>>>>>>> 8864e18... added versioning
 NAME = TOSSUG Baby Fish
 
 # *DOCUMENTATION*
