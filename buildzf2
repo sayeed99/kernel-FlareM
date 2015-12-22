@@ -84,7 +84,8 @@ find . -type f -exec zip FlareM_"$VER".zip {} +
 nowf=$(date +"%T")
 cd ..
 make clean
-printf "\n\n zip created\n"
+printf "cleaned files"
+printf "\n\nzip created\n"
 end=`date +%s`
 runtime=$((end-start))
 echo "Completion Time :"
