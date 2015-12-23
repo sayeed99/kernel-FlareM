@@ -6,11 +6,15 @@ EXTRAVERSION =
 =======
 SUBLEVEL = 20
 <<<<<<< HEAD
+<<<<<<< HEAD
 EXTRAVERSION = _FlareM_v5
 >>>>>>> 8864e18... added versioning
 =======
 EXTRAVERSION = _FlareM_v6
 >>>>>>> fcfc832... changed versioning and enabled zram
+=======
+EXTRAVERSION = _FlareM_v7c
+>>>>>>> 3f71f4b... user version number for versioning
 NAME = TOSSUG Baby Fish
 
 # *DOCUMENTATION*
