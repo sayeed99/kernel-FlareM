@@ -7,6 +7,7 @@ EXTRAVERSION =
 SUBLEVEL = 20
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 EXTRAVERSION = _FlareM_v5
 >>>>>>> 8864e18... added versioning
 =======
@@ -15,6 +16,9 @@ EXTRAVERSION = _FlareM_v6
 =======
 EXTRAVERSION = _FlareM_v7c
 >>>>>>> 3f71f4b... user version number for versioning
+=======
+EXTRAVERSION = _FlareM_v7
+>>>>>>> 1c42193... Added exfat support from dorimanx repo
 NAME = TOSSUG Baby Fish
 
 # *DOCUMENTATION*
