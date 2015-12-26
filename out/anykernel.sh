@@ -5,7 +5,7 @@
 # EDIFY properties
 kernel.string=Zenfone 2 AnyKernel Script
 do.devicecheck=0
-do.initd=0
+do.initd=1
 do.modules=0
 do.cleanup=0
 device.name1=Z00A
