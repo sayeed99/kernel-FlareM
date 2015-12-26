@@ -2982,7 +2982,7 @@ static struct ext4_li_request *ext4_li_request_new(struct super_block *sb,
 	 * spread the inode table initialization requests
 	 * better.
 	 */
-	get_random_bytes(&rnd, sizeof(rnd));
+	erandom_get_random_bytes((char *)&rnd, (size_t)sizeof(rnd));
 	elr->lr_next_sched = jiffies + (unsigned long)rnd %
 			     (EXT4_DEF_LI_MAX_START_DELAY * HZ);
 
@@ -3769,7 +3769,7 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
 		}
 
 	sbi->s_gdb_count = db_count;
-	get_random_bytes(&sbi->s_next_generation, sizeof(u32));
+	erandom_get_random_bytes((char *)&sbi->s_next_generation, sizeof(u32));
 	spin_lock_init(&sbi->s_next_gen_lock);
 
 	init_timer(&sbi->s_err_report);
@@ -4630,8 +4630,6 @@ static int ext4_remount(struct super_block *sb, int *flags, char *data)
 	int i, j;
 #endif
 	char *orig_data = kstrdup(data, GFP_KERNEL);
-
-	sync_filesystem(sb);
 
 	/* Store the original options */
 	old_sb_flags = sb->s_flags;
