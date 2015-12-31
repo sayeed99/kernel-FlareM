@@ -8,6 +8,7 @@ SUBLEVEL = 20
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 EXTRAVERSION = _FlareM_v5
 >>>>>>> 8864e18... added versioning
 =======
@@ -19,6 +20,9 @@ EXTRAVERSION = _FlareM_v7c
 =======
 EXTRAVERSION = _FlareM_v7
 >>>>>>> 1c42193... Added exfat support from dorimanx repo
+=======
+EXTRAVERSION = _FlareM_v9
+>>>>>>> 0a10355... enable O3 optimization
 NAME = TOSSUG Baby Fish
 
 # *DOCUMENTATION*
@@ -273,9 +277,14 @@ HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-p
 =======
 HOSTCC       = $(CCACHE) gcc
 HOSTCXX      = $(CCACHE) g++
+<<<<<<< HEAD
 HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
 >>>>>>> 6970594... Enable ccache, Add build script and added kernel packer
 HOSTCXXFLAGS = -O2
+=======
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 -fno-tree-vectorize -fomit-frame-pointer
+HOSTCXXFLAGS = -O3
+>>>>>>> 0a10355... enable O3 optimization
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -609,7 +618,7 @@ all: vmlinux
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
 else
-KBUILD_CFLAGS	+= -O2
+KBUILD_CFLAGS	+= -O3
 endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
