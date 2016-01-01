@@ -32,7 +32,7 @@ modules.builtin
 *.patch
 *.gcno
 *.zip
-bzImage
+out/bzImage
 buildzf2
 
 #
@@ -83,6 +83,7 @@ GSYMS
 GTAGS
 
 *.orig
+*.rej
 *~
 \#*#
 

@@ -9,6 +9,7 @@ SUBLEVEL = 20
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 EXTRAVERSION = _FlareM_v5
 >>>>>>> 8864e18... added versioning
 =======
@@ -23,6 +24,9 @@ EXTRAVERSION = _FlareM_v7
 =======
 EXTRAVERSION = _FlareM_v9
 >>>>>>> 0a10355... enable O3 optimization
+=======
+EXTRAVERSION = _FlareM_v10
+>>>>>>> f6b6759... gitignore changes
 NAME = TOSSUG Baby Fish
 
 # *DOCUMENTATION*
