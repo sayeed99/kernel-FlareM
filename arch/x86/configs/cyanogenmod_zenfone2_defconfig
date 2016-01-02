@@ -1,36 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-# Linux/x86_64 3.10.20 Kernel Configuration
-=======
-<<<<<<< HEAD
-=======
->>>>>>> ae35efa... Revert "fix previous cherry-pick"
-# Linux/x86 3.10.20 Kernel Configuration
-=======
-# Linux/x86_64 3.10.20_FlareM_v9 Kernel Configuration
->>>>>>> 359c894... Regenerate defconfig
-<<<<<<< HEAD
->>>>>>> 0cfcf2c... Regenerate defconfig
-=======
-# Linux/x86_64 3.10.20_FlareM_v9 Kernel Configuration
->>>>>>> c75b394... fix previous cherry-pick
-=======
->>>>>>> ae35efa... Revert "fix previous cherry-pick"
-=======
-# Linux/x86_64 3.10.20_FlareM_v9 Kernel Configuration
->>>>>>> dcb6952... regen : defconfig
-=======
-# Linux/x86 3.10.20_FlareM_v10 Kernel Configuration
->>>>>>> 63d8351... Regenerate defconfig
-=======
-# Linux/x86_64 3.10.20_FlareM_v9 Kernel Configuration
->>>>>>> 3bd56f6... REGENERATE: Defconfig
+# Linux/x86_64 3.10.20_FlareM_v10 Kernel Configuration
 #
 CONFIG_64BIT=y
 CONFIG_X86_64=y
@@ -82,7 +52,7 @@ CONFIG_EXPERIMENTAL=y
 CONFIG_INIT_ENV_ARG_LIMIT=32
 CONFIG_CROSS_COMPILE=""
 CONFIG_LOCALVERSION=""
-CONFIG_LOCALVERSION_AUTO=y
+# CONFIG_LOCALVERSION_AUTO is not set
 CONFIG_HAVE_KERNEL_GZIP=y
 CONFIG_HAVE_KERNEL_BZIP2=y
 CONFIG_HAVE_KERNEL_LZMA=y
@@ -175,7 +145,8 @@ CONFIG_CGROUPS=y
 CONFIG_CGROUP_DEBUG=y
 CONFIG_CGROUP_FREEZER=y
 CONFIG_CGROUP_DEVICE=y
-# CONFIG_CPUSETS is not set
+CONFIG_CPUSETS=y
+CONFIG_PROC_PID_CPUSET=y
 CONFIG_CGROUP_CPUACCT=y
 CONFIG_RESOURCE_COUNTERS=y
 # CONFIG_MEMCG is not set
@@ -554,6 +525,7 @@ CONFIG_CPU_FREQ_STAT=y
 CONFIG_CPU_FREQ_STAT_DETAILS=y
 CONFIG_CPU_FREQ_DEFAULT_GOV_ALUCARD=y
 # CONFIG_CPU_FREQ_DEFAULT_GOV_INTERACTIVEX is not set
+# CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTMAX is not set
 # CONFIG_CPU_FREQ_DEFAULT_GOV_BIOSHOCK is not set
 # CONFIG_CPU_FREQ_DEFAULT_GOV_CONSERVATIVEX is not set
 # CONFIG_CPU_FREQ_DEFAULT_GOV_LAGFREE is not set
@@ -569,6 +541,7 @@ CONFIG_CPU_FREQ_DEFAULT_GOV_ALUCARD=y
 # CONFIG_CPU_FREQ_DEFAULT_GOV_INTERACTIVE is not set
 CONFIG_CPU_FREQ_GOV_BIOSHOCK=y
 CONFIG_CPU_FREQ_GOV_INTERACTIVEX=y
+# CONFIG_CPU_FREQ_GOV_SMARTMAX is not set
 CONFIG_CPU_FREQ_GOV_CONSERVATIVEX=y
 CONFIG_CPU_FREQ_GOV_LIONHEART=y
 CONFIG_CPU_FREQ_GOV_YANKACTIVE=y
@@ -3307,6 +3280,9 @@ CONFIG_NET_VENDOR_SILICOM=y
 # CONFIG_BPCTL is not set
 # CONFIG_CED1401 is not set
 # CONFIG_DGRP is not set
+CONFIG_ZCACHE=y
+# CONFIG_ZCACHE_DEBUG is not set
+# CONFIG_RAMSTER is not set
 # CONFIG_USB_DWC2 is not set
 # CONFIG_INTEL_NORTHPEAK is not set
 # CONFIG_SVENTX is not set
@@ -4187,7 +4163,7 @@ CONFIG_CRYPTO_TWOFISH_AVX_X86_64=y
 #
 CONFIG_CRYPTO_DEFLATE=y
 # CONFIG_CRYPTO_ZLIB is not set
-# CONFIG_CRYPTO_LZO is not set
+CONFIG_CRYPTO_LZO=y
 
 #
 # Random Number Generation
