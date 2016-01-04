@@ -83,6 +83,7 @@ find . -type f -exec zip FlareM_"$VER".zip {} +
 nowf=$(date +"%T")
 cd ..
 make clean
+rm out/bzImage
 printf "cleaned files"
 printf "\n\nzip created\n"
 end=`date +%s`
