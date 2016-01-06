@@ -44,7 +44,7 @@ else
    sleep 1
 fi
 wmctrl -r :ACTIVE: -N "Compiling FlareM Kernel"
-make $EV -j$CPUS
+make $EV #-j$CPUS
 
 if [ -f $BZIMAGE ];
 then
