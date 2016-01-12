@@ -1337,9 +1337,9 @@ static struct android_usb_function *supported_functions[] = {
 	&mass_storage_function,
 	&accessory_function,
 	&audio_source_function,
-	&hid_function,
 	&dvcdfx_function,
 	&dvctrace_function,
+	&hid_function,
 	NULL
 };
 
@@ -1544,8 +1544,8 @@ functions_store(struct device *pdev, struct device_attribute *attr,
 							   name, err);
 	}
 
-	/* HID driver always enabled, it's the whole point of this kernel patch */
 	android_enable_function(dev, "hid");
+
 	mutex_unlock(&dev->mutex);
 
 	return size;
