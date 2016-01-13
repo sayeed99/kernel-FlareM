@@ -270,11 +270,11 @@ source "fs/nls/Kconfig"
 source "fs/dlm/Kconfig"
 
 config ASYNC_FSYNC
-	bool "asynchronous fsync"
+	bool "HTC's Asynchronous fsync"
 	default y
 
 config DYNAMIC_FSYNC
-	bool "dynamic file sync control"
+	bool "Faux123's Dynamic file sync control"
 	default n
 	help
 	An experimental file sync control using Android's power suspend / late resume drivers
