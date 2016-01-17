@@ -344,11 +344,9 @@ CC		= $(CCACHE) $(CROSS_COMPILE)gcc
 CPP		= $(CC) -E
 # Check to see if the kernel is being built inline with saber host toolchains for graphite flags for CC/CPP
 # This get's passed to the host since we use $(CROSS_COMPILE)gcc
-ifeq ($(USING_SABER_LINUX),yes)
 ifeq ($(ENABLE_GRAPHITE),true)
 	CC += -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
 	CPP += -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
-endif
 endif
 AR		= $(CROSS_COMPILE)ar
 NM		= $(CROSS_COMPILE)nm
@@ -364,13 +362,13 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-KERNEL_FLAGS 	=  -O3 -fgcse-sm -fgcse-las -fsched-spec-load -fforce-addr -ffast-math -fsingle-precision-constan -ftree-vectorize -mvectorize-with-neon-quad -funroll-loops -ftree-loop-im -ftree-loop-ivcanon -fmodulo-sched -fmodulo-sched-allow-regmoves -fivopts -fopenmp -fopenmp-simd -fsimd-cost-model=unlimited -fgraphite
+KERNEL_FLAGS 	=  -Ofast -fgcse-sm -fgcse-las -fsched-spec-load -fforce-addr -ffast-math -fsingle-precision-constan -ftree-vectorize -mvectorize-with-neon-quad -funroll-loops -ftree-loop-im -ftree-loop-ivcanon -fmodulo-sched -fmodulo-sched-allow-regmoves -fivopts -fopenmp -fopenmp-simd -fsimd-cost-model=unlimited -fgraphite
 MOD_FLAGS 	= -DMODULE $(KERNEL_FLAGS)
 CFLAGS_MODULE 	= $(MODFLAGS) -Ofast
 AFLAGS_MODULE 	= $(MODFLAGS) -Ofast
 LDFLAGS_MODULE 	= -T $(srctree)/scripts/module-common.lds
-CFLAGS_KERNEL  	= $(MODFLAGS) -O2
-AFLAGS_KERNEL 	= $(MODFLAGS) -O2
+CFLAGS_KERNEL  	= $(MODFLAGS) -Ofast
+AFLAGS_KERNEL 	= $(MODFLAGS) -Ofast
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
