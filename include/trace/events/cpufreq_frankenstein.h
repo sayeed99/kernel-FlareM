@@ -1,8 +1,8 @@
 #undef TRACE_SYSTEM
-#define TRACE_SYSTEM cpufreq_sayactivex
+#define TRACE_SYSTEM cpufreq_frankenstein
 
-#if !defined(_TRACE_CPUFREQ_sayactivex_H) || defined(TRACE_HEADER_MULTI_READ)
-#define _TRACE_CPUFREQ_sayactivex_H
+#if !defined(_TRACE_CPUFREQ_frankenstein_H) || defined(TRACE_HEADER_MULTI_READ)
+#define _TRACE_CPUFREQ_frankenstein_H
 
 #include <linux/tracepoint.h>
 
@@ -28,7 +28,7 @@ DECLARE_EVENT_CLASS(set,
 	      __entry->actualfreq)
 );
 
-DEFINE_EVENT(set, cpufreq_sayactivex_setspeed,
+DEFINE_EVENT(set, cpufreq_frankenstein_setspeed,
 	TP_PROTO(u32 cpu_id, unsigned long targfreq,
 	     unsigned long actualfreq),
 	TP_ARGS(cpu_id, targfreq, actualfreq)
@@ -61,28 +61,28 @@ DECLARE_EVENT_CLASS(loadeval,
 		      __entry->curactual, __entry->newtarg)
 );
 
-DEFINE_EVENT(loadeval, cpufreq_sayactivex_target,
+DEFINE_EVENT(loadeval, cpufreq_frankenstein_target,
 	    TP_PROTO(unsigned long cpu_id, unsigned long load,
 		     unsigned long curtarg, unsigned long curactual,
 		     unsigned long newtarg),
 	    TP_ARGS(cpu_id, load, curtarg, curactual, newtarg)
 );
 
-DEFINE_EVENT(loadeval, cpufreq_sayactivex_already,
+DEFINE_EVENT(loadeval, cpufreq_frankenstein_already,
 	    TP_PROTO(unsigned long cpu_id, unsigned long load,
 		     unsigned long curtarg, unsigned long curactual,
 		     unsigned long newtarg),
 	    TP_ARGS(cpu_id, load, curtarg, curactual, newtarg)
 );
 
-DEFINE_EVENT(loadeval, cpufreq_sayactivex_notyet,
+DEFINE_EVENT(loadeval, cpufreq_frankenstein_notyet,
 	    TP_PROTO(unsigned long cpu_id, unsigned long load,
 		     unsigned long curtarg, unsigned long curactual,
 		     unsigned long newtarg),
 	    TP_ARGS(cpu_id, load, curtarg, curactual, newtarg)
 );
 
-TRACE_EVENT(cpufreq_sayactivex_boost,
+TRACE_EVENT(cpufreq_frankenstein_boost,
 	    TP_PROTO(const char *s),
 	    TP_ARGS(s),
 	    TP_STRUCT__entry(
@@ -94,7 +94,7 @@ TRACE_EVENT(cpufreq_sayactivex_boost,
 	    TP_printk("%s", __get_str(s))
 );
 
-TRACE_EVENT(cpufreq_sayactivex_unboost,
+TRACE_EVENT(cpufreq_frankenstein_unboost,
 	    TP_PROTO(const char *s),
 	    TP_ARGS(s),
 	    TP_STRUCT__entry(
@@ -106,7 +106,7 @@ TRACE_EVENT(cpufreq_sayactivex_unboost,
 	    TP_printk("%s", __get_str(s))
 );
 
-#endif /* _TRACE_CPUFREQ_SAYACTIVEX_H */
+#endif /* _TRACE_CPUFREQ_FRANKENSTEIN_H */
 
 /* This part must be outside protection */
 #include <trace/define_trace.h>
