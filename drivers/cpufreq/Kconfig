@@ -72,14 +72,14 @@ config CPU_FREQ_DEFAULT_GOV_DARKNESS
 	select CPU_FREQ_GOV_DARKNESS
 	help
 
-config CPU_FREQ_DEFAULT_GOV_SAYACTIVEX
-	bool "sayactiveX"
-	select CPU_FREQ_GOV_SAYACTIVEX
+config CPU_FREQ_DEFAULT_GOV_FRANKENSTEIN
+	bool "frankenstein"
+	select CPU_FREQ_GOV_frankenstein
 	help
-	  Use the CPUFreq governor 'sayactiveX' as default. This allows
+	  Use the CPUFreq governor 'frankenstein' as default. This allows
 	  you to get a full dynamic cpu frequency capable system by simply
 	  loading your cpufreq low-level hardware driver, using the
-	  'sayactiveX' governor for latency-sensitive workloads.
+	  'frankenstein' governor for latency-sensitive workloads.
 
 config CPU_FREQ_DEFAULT_GOV_SMARTMAX
 	bool "smartmax"
@@ -209,10 +209,10 @@ config CPU_FREQ_GOV_BIOSHOCK
 	help
 	  'bioshock' - More aggressive version of conservative
 
-config CPU_FREQ_GOV_SAYACTIVEX
-	tristate "'sayactiveX' cpufreq policy governor"
+config CPU_FREQ_GOV_FRANKENSTEIN
+	tristate "'frankenstein' cpufreq policy governor"
 	help
-	  'sayactiveX' - Modified version of interactive with sleep+wake code.
+	  'frankenstein' - Modified version of interactive with sleep+wake code.
 
 config CPU_FREQ_GOV_SMARTMAX
 	tristate "'smartmax' cpufreq governor"

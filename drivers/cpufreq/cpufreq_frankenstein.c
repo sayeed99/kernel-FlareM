@@ -1,5 +1,5 @@
 /*
- * drivers/cpufreq/cpufreq_sayactivex.c
+ * drivers/cpufreq/cpufreq_frankenstein.c
  *
  * Copyright (C) 2016 Google, Inc.
  *
@@ -36,13 +36,13 @@
 #include <asm/cputime.h>
 
 #define CREATE_TRACE_POINTS
-#include <trace/events/cpufreq_sayactivex.h>
+#include <trace/events/cpufreq_frankenstein.h>
 
 //for adding early suspend and late resume handlers
 #include <linux/earlysuspend.h>
 #include <linux/wait.h>
 
-struct cpufreq_sayactivex_cpuinfo {
+struct cpufreq_frankenstein_cpuinfo {
 	struct timer_list cpu_timer;
 	struct timer_list cpu_slack_timer;
 	spinlock_t load_lock; /* protects the next 4 fields */
@@ -62,7 +62,7 @@ struct cpufreq_sayactivex_cpuinfo {
 	int governor_enabled;
 };
 
-static DEFINE_PER_CPU(struct cpufreq_sayactivex_cpuinfo, cpuinfo);
+static DEFINE_PER_CPU(struct cpufreq_frankenstein_cpuinfo, cpuinfo);
 
 /*frequency handling*/
 static struct task_struct *speedchange_task;
@@ -79,7 +79,7 @@ static unsigned int default_target_loads[] = {DEFAULT_TARGET_LOAD};
 static unsigned int default_above_hispeed_delay[] = {
 	DEFAULT_ABOVE_HISPEED_DELAY };
 
-struct cpufreq_sayactivex_tunables {
+struct cpufreq_frankenstein_tunables {
 	int usage_count;
 	/* Hi speed to bump to from lo speed when load burst (default max) */
 	unsigned int hispeed_freq;
@@ -132,7 +132,7 @@ struct cpufreq_sayactivex_tunables {
 };
 
 /* For cases where we have single governor instance for system */
-static struct cpufreq_sayactivex_tunables *common_tunables;
+static struct cpufreq_frankenstein_tunables *common_tunables;
 static struct kobject *get_governor_parent_kobj(struct cpufreq_policy *policy);
 static struct attribute_group *get_sysfs_attr(void);
 
@@ -174,10 +174,10 @@ static inline cputime64_t get_cpu_idle_time(
 	return idle_time;
 }
 
-static void cpufreq_sayactivex_timer_resched(
-	struct cpufreq_sayactivex_cpuinfo *pcpu)
+static void cpufreq_frankenstein_timer_resched(
+	struct cpufreq_frankenstein_cpuinfo *pcpu)
 {
-	struct cpufreq_sayactivex_tunables *tunables =
+	struct cpufreq_frankenstein_tunables *tunables =
 		pcpu->policy->governor_data;
 	unsigned long expires;
 	unsigned long flags;
@@ -205,10 +205,10 @@ static void cpufreq_sayactivex_timer_resched(
  * The cpu_timer and cpu_slack_timer must be deactivated when calling this
  * function.
  */
-static void cpufreq_sayactivex_timer_start(
-	struct cpufreq_sayactivex_tunables *tunables, int cpu)
+static void cpufreq_frankenstein_timer_start(
+	struct cpufreq_frankenstein_tunables *tunables, int cpu)
 {
-	struct cpufreq_sayactivex_cpuinfo *pcpu = &per_cpu(cpuinfo, cpu);
+	struct cpufreq_frankenstein_cpuinfo *pcpu = &per_cpu(cpuinfo, cpu);
 	unsigned long expires = jiffies +
 		usecs_to_jiffies(tunables->timer_rate);
 	unsigned long flags;
@@ -232,7 +232,7 @@ static void cpufreq_sayactivex_timer_start(
 }
 
 static unsigned int freq_to_above_hispeed_delay(
-	struct cpufreq_sayactivex_tunables *tunables,
+	struct cpufreq_frankenstein_tunables *tunables,
 	unsigned int freq)
 {
 	int i;
@@ -251,7 +251,7 @@ static unsigned int freq_to_above_hispeed_delay(
 }
 
 static unsigned int freq_to_targetload(
-	struct cpufreq_sayactivex_tunables *tunables, unsigned int freq)
+	struct cpufreq_frankenstein_tunables *tunables, unsigned int freq)
 {
 	int i;
 	unsigned int ret;
@@ -273,7 +273,7 @@ static unsigned int freq_to_targetload(
  * choose_freq() will find the minimum frequency that does not exceed its
  * target load given the current load.
  */
-static unsigned int choose_freq(struct cpufreq_sayactivex_cpuinfo *pcpu,
+static unsigned int choose_freq(struct cpufreq_frankenstein_cpuinfo *pcpu,
 		unsigned int loadadjfreq)
 {
 	unsigned int freq = pcpu->policy->cur;
@@ -360,8 +360,8 @@ static unsigned int choose_freq(struct cpufreq_sayactivex_cpuinfo *pcpu,
 
 static u64 update_load(int cpu)
 {
-	struct cpufreq_sayactivex_cpuinfo *pcpu = &per_cpu(cpuinfo, cpu);
-	struct cpufreq_sayactivex_tunables *tunables =
+	struct cpufreq_frankenstein_cpuinfo *pcpu = &per_cpu(cpuinfo, cpu);
+	struct cpufreq_frankenstein_tunables *tunables =
 		pcpu->policy->governor_data;
 	u64 now;
 	u64 now_idle;
@@ -385,16 +385,16 @@ static u64 update_load(int cpu)
 	return now;
 }
 
-static void cpufreq_sayactivex_timer(unsigned long data)
+static void cpufreq_frankenstein_timer(unsigned long data)
 {
 	u64 now;
 	unsigned int delta_time;
 	unsigned int cur;
 	u64 cputime_speedadj;
 	int cpu_load;
-	struct cpufreq_sayactivex_cpuinfo *pcpu =
+	struct cpufreq_frankenstein_cpuinfo *pcpu =
 		&per_cpu(cpuinfo, data);
-	struct cpufreq_sayactivex_tunables *tunables =
+	struct cpufreq_frankenstein_tunables *tunables =
 		pcpu->policy->governor_data;
 	unsigned int new_freq;
 	unsigned int loadadjfreq;
@@ -448,7 +448,7 @@ static void cpufreq_sayactivex_timer(unsigned long data)
 	    new_freq > pcpu->target_freq &&
 	    now - pcpu->hispeed_validate_time <
 	    freq_to_above_hispeed_delay(tunables, pcpu->target_freq)) {
-		trace_cpufreq_sayactivex_notyet(
+		trace_cpufreq_frankenstein_notyet(
 			data, cpu_load, pcpu->target_freq,
 			pcpu->policy->cur, new_freq);
 		spin_unlock_irqrestore(&pcpu->target_freq_lock, flags);
@@ -473,7 +473,7 @@ static void cpufreq_sayactivex_timer(unsigned long data)
 	if (new_freq < pcpu->floor_freq) {
 		if (now - pcpu->floor_validate_time <
 				tunables->min_sample_time) {
-			trace_cpufreq_sayactivex_notyet(
+			trace_cpufreq_frankenstein_notyet(
 				data, cpu_load, pcpu->target_freq,
 				pcpu->policy->cur, new_freq);
 			spin_unlock_irqrestore(&pcpu->target_freq_lock, flags);
@@ -496,14 +496,14 @@ static void cpufreq_sayactivex_timer(unsigned long data)
 
 	if (pcpu->target_freq == new_freq &&
 			pcpu->target_freq <= pcpu->policy->cur) {
-		trace_cpufreq_sayactivex_already(
+		trace_cpufreq_frankenstein_already(
 			data, cpu_load, pcpu->target_freq,
 			pcpu->policy->cur, new_freq);
 		spin_unlock_irqrestore(&pcpu->target_freq_lock, flags);
 		goto rearm_if_notmax;
 	}
 
-	trace_cpufreq_sayactivex_target(data, cpu_load, pcpu->target_freq,
+	trace_cpufreq_frankenstein_target(data, cpu_load, pcpu->target_freq,
 					 pcpu->policy->cur, new_freq);
 
 	pcpu->target_freq = new_freq;
@@ -523,16 +523,16 @@ rearm_if_notmax:
 
 rearm:
 	if (!timer_pending(&pcpu->cpu_timer))
-		cpufreq_sayactivex_timer_resched(pcpu);
+		cpufreq_frankenstein_timer_resched(pcpu);
 
 exit:
 	up_read(&pcpu->enable_sem);
 	return;
 }
 
-static void cpufreq_sayactivex_idle_start(void)
+static void cpufreq_frankenstein_idle_start(void)
 {
-	struct cpufreq_sayactivex_cpuinfo *pcpu =
+	struct cpufreq_frankenstein_cpuinfo *pcpu =
 		&per_cpu(cpuinfo, smp_processor_id());
 	int pending;
 
@@ -556,15 +556,15 @@ static void cpufreq_sayactivex_idle_start(void)
 		 */
 		/* No need to reschdule on Merrifield platform */
 		if (!pending && (boot_cpu_data.x86_model != 0x4a))
-			cpufreq_sayactivex_timer_resched(pcpu);
+			cpufreq_frankenstein_timer_resched(pcpu);
 	}
 
 	up_read(&pcpu->enable_sem);
 }
 
-static void cpufreq_sayactivex_idle_end(void)
+static void cpufreq_frankenstein_idle_end(void)
 {
-	struct cpufreq_sayactivex_cpuinfo *pcpu =
+	struct cpufreq_frankenstein_cpuinfo *pcpu =
 		&per_cpu(cpuinfo, smp_processor_id());
 
 	if (!down_read_trylock(&pcpu->enable_sem))
@@ -576,22 +576,22 @@ static void cpufreq_sayactivex_idle_end(void)
 
 	/* Arm the timer for 1-2 ticks later if not already. */
 	if (!timer_pending(&pcpu->cpu_timer)) {
-		cpufreq_sayactivex_timer_resched(pcpu);
+		cpufreq_frankenstein_timer_resched(pcpu);
 	} else if (time_after_eq(jiffies, pcpu->cpu_timer.expires)) {
 		del_timer(&pcpu->cpu_timer);
 		del_timer(&pcpu->cpu_slack_timer);
-		cpufreq_sayactivex_timer(smp_processor_id());
+		cpufreq_frankenstein_timer(smp_processor_id());
 	}
 
 	up_read(&pcpu->enable_sem);
 }
 
-static int cpufreq_sayactivex_speedchange_task(void *data)
+static int cpufreq_frankenstein_speedchange_task(void *data)
 {
 	unsigned int cpu;
 	cpumask_t tmp_mask;
 	unsigned long flags;
-	struct cpufreq_sayactivex_cpuinfo *pcpu;
+	struct cpufreq_frankenstein_cpuinfo *pcpu;
 	while (1) {
 		set_current_state(TASK_INTERRUPTIBLE);
 		spin_lock_irqsave(&speedchange_cpumask_lock, flags);
@@ -625,7 +625,7 @@ static int cpufreq_sayactivex_speedchange_task(void *data)
 			}
 
 			for_each_cpu(j, pcpu->policy->cpus) {
-				struct cpufreq_sayactivex_cpuinfo *pjcpu =
+				struct cpufreq_frankenstein_cpuinfo *pjcpu =
 					&per_cpu(cpuinfo, j);
 
 				if (pjcpu->target_freq > max_freq)
@@ -635,7 +635,7 @@ static int cpufreq_sayactivex_speedchange_task(void *data)
 				__cpufreq_driver_target(pcpu->policy,
 							max_freq,
 							CPUFREQ_RELATION_H);
-				trace_cpufreq_sayactivex_setspeed(cpu,
+				trace_cpufreq_frankenstein_setspeed(cpu,
 							max_freq,
 							pcpu->policy->cur);
 			}
@@ -647,12 +647,12 @@ static int cpufreq_sayactivex_speedchange_task(void *data)
 	return 0;
 }
 
-static void cpufreq_sayactivex_boost(struct cpufreq_sayactivex_tunables *tunables)
+static void cpufreq_frankenstein_boost(struct cpufreq_frankenstein_tunables *tunables)
 {
 	int i;
 	int anyboost = 0;
 	unsigned long flags[2];
-	struct cpufreq_sayactivex_cpuinfo *pcpu;
+	struct cpufreq_frankenstein_cpuinfo *pcpu;
 
 	tunables->boosted = true;
 
@@ -688,13 +688,13 @@ static void cpufreq_sayactivex_boost(struct cpufreq_sayactivex_tunables *tunable
 		wake_up_process(speedchange_task);
 }
 
-static void cpufreq_sayactivex_touchboost(void)
+static void cpufreq_frankenstein_touchboost(void)
 {
 	int i;
 	int anyboost = 0;
 	unsigned long flags;
-	struct cpufreq_sayactivex_cpuinfo *pcpu;
-	struct cpufreq_sayactivex_tunables *tunables;
+	struct cpufreq_frankenstein_cpuinfo *pcpu;
+	struct cpufreq_frankenstein_tunables *tunables;
 
 	spin_lock_irqsave(&speedchange_cpumask_lock, flags);
 	for_each_online_cpu(i) {
@@ -720,11 +720,11 @@ static void cpufreq_sayactivex_touchboost(void)
 }
 
 
-static int cpufreq_sayactivex_notifier(
+static int cpufreq_frankenstein_notifier(
 	struct notifier_block *nb, unsigned long val, void *data)
 {
 	struct cpufreq_freqs *freq = data;
-	struct cpufreq_sayactivex_cpuinfo *pcpu;
+	struct cpufreq_frankenstein_cpuinfo *pcpu;
 	int cpu;
 	unsigned long flags;
 
@@ -738,7 +738,7 @@ static int cpufreq_sayactivex_notifier(
 		}
 
 		for_each_cpu(cpu, pcpu->policy->cpus) {
-			struct cpufreq_sayactivex_cpuinfo *pjcpu =
+			struct cpufreq_frankenstein_cpuinfo *pjcpu =
 				&per_cpu(cpuinfo, cpu);
 			if (cpu != freq->cpu) {
 				if (!down_read_trylock(&pjcpu->enable_sem))
@@ -761,7 +761,7 @@ static int cpufreq_sayactivex_notifier(
 }
 
 static struct notifier_block cpufreq_notifier_block = {
-	.notifier_call = cpufreq_sayactivex_notifier,
+	.notifier_call = cpufreq_frankenstein_notifier,
 };
 
 static unsigned int *get_tokenized_data(const char *buf, int *num_tokens)
@@ -810,7 +810,7 @@ err:
 }
 
 static ssize_t show_target_loads(
-	struct cpufreq_sayactivex_tunables *tunables,
+	struct cpufreq_frankenstein_tunables *tunables,
 	char *buf)
 {
 	int i;
@@ -829,7 +829,7 @@ static ssize_t show_target_loads(
 }
 
 static ssize_t store_target_loads(
-	struct cpufreq_sayactivex_tunables *tunables,
+	struct cpufreq_frankenstein_tunables *tunables,
 	const char *buf, size_t count)
 {
 	int ntokens;
@@ -850,7 +850,7 @@ static ssize_t store_target_loads(
 }
 
 static ssize_t show_above_hispeed_delay(
-	struct cpufreq_sayactivex_tunables *tunables, char *buf)
+	struct cpufreq_frankenstein_tunables *tunables, char *buf)
 {
 	int i;
 	ssize_t ret = 0;
@@ -869,7 +869,7 @@ static ssize_t show_above_hispeed_delay(
 }
 
 static ssize_t store_above_hispeed_delay(
-	struct cpufreq_sayactivex_tunables *tunables,
+	struct cpufreq_frankenstein_tunables *tunables,
 	const char *buf, size_t count)
 {
 	int ntokens;
@@ -890,13 +890,13 @@ static ssize_t store_above_hispeed_delay(
 
 }
 
-static ssize_t show_hispeed_freq(struct cpufreq_sayactivex_tunables *tunables,
+static ssize_t show_hispeed_freq(struct cpufreq_frankenstein_tunables *tunables,
 		char *buf)
 {
 	return sprintf(buf, "%u\n", tunables->hispeed_freq);
 }
 
-static ssize_t store_hispeed_freq(struct cpufreq_sayactivex_tunables *tunables,
+static ssize_t store_hispeed_freq(struct cpufreq_frankenstein_tunables *tunables,
 		const char *buf, size_t count)
 {
 	int ret;
@@ -909,13 +909,13 @@ static ssize_t store_hispeed_freq(struct cpufreq_sayactivex_tunables *tunables,
 	return count;
 }
 
-static ssize_t show_go_hispeed_load(struct cpufreq_sayactivex_tunables
+static ssize_t show_go_hispeed_load(struct cpufreq_frankenstein_tunables
 		*tunables, char *buf)
 {
 	return sprintf(buf, "%lu\n", tunables->go_hispeed_load);
 }
 
-static ssize_t store_go_hispeed_load(struct cpufreq_sayactivex_tunables
+static ssize_t store_go_hispeed_load(struct cpufreq_frankenstein_tunables
 		*tunables, const char *buf, size_t count)
 {
 	int ret;
@@ -928,13 +928,13 @@ static ssize_t store_go_hispeed_load(struct cpufreq_sayactivex_tunables
 	return count;
 }
 
-static ssize_t show_touchboost_freq(struct cpufreq_sayactivex_tunables
+static ssize_t show_touchboost_freq(struct cpufreq_frankenstein_tunables
 		*tunables, char *buf)
 {
 	return sprintf(buf, "%lu\n", tunables->touchboost_freq);
 }
 
-static ssize_t store_touchboost_freq(struct cpufreq_sayactivex_tunables
+static ssize_t store_touchboost_freq(struct cpufreq_frankenstein_tunables
 				*tunables, const char *buf, size_t count)
 {
 	int ret;
@@ -947,13 +947,13 @@ static ssize_t store_touchboost_freq(struct cpufreq_sayactivex_tunables
 	return count;
 }
 
-static ssize_t show_min_sample_time(struct cpufreq_sayactivex_tunables
+static ssize_t show_min_sample_time(struct cpufreq_frankenstein_tunables
 		*tunables, char *buf)
 {
 	return sprintf(buf, "%lu\n", tunables->min_sample_time);
 }
 
-static ssize_t store_min_sample_time(struct cpufreq_sayactivex_tunables
+static ssize_t store_min_sample_time(struct cpufreq_frankenstein_tunables
 		*tunables, const char *buf, size_t count)
 {
 	int ret;
@@ -966,13 +966,13 @@ static ssize_t store_min_sample_time(struct cpufreq_sayactivex_tunables
 	return count;
 }
 
-static ssize_t show_timer_rate(struct cpufreq_sayactivex_tunables *tunables,
+static ssize_t show_timer_rate(struct cpufreq_frankenstein_tunables *tunables,
 		char *buf)
 {
 	return sprintf(buf, "%lu\n", tunables->timer_rate);
 }
 
-static ssize_t store_timer_rate(struct cpufreq_sayactivex_tunables *tunables,
+static ssize_t store_timer_rate(struct cpufreq_frankenstein_tunables *tunables,
 		const char *buf, size_t count)
 {
 	int ret;
@@ -985,13 +985,13 @@ static ssize_t store_timer_rate(struct cpufreq_sayactivex_tunables *tunables,
 	return count;
 }
 
-static ssize_t show_timer_slack(struct cpufreq_sayactivex_tunables *tunables,
+static ssize_t show_timer_slack(struct cpufreq_frankenstein_tunables *tunables,
 		char *buf)
 {
 	return sprintf(buf, "%d\n", tunables->timer_slack_val);
 }
 
-static ssize_t store_timer_slack(struct cpufreq_sayactivex_tunables *tunables,
+static ssize_t store_timer_slack(struct cpufreq_frankenstein_tunables *tunables,
 		const char *buf, size_t count)
 {
 	int ret;
@@ -1005,13 +1005,13 @@ static ssize_t store_timer_slack(struct cpufreq_sayactivex_tunables *tunables,
 	return count;
 }
 
-static ssize_t show_boost(struct cpufreq_sayactivex_tunables *tunables,
+static ssize_t show_boost(struct cpufreq_frankenstein_tunables *tunables,
 			  char *buf)
 {
 	return sprintf(buf, "%d\n", tunables->boost_val);
 }
 
-static ssize_t store_boost(struct cpufreq_sayactivex_tunables *tunables,
+static ssize_t store_boost(struct cpufreq_frankenstein_tunables *tunables,
 			   const char *buf, size_t count)
 {
 	int ret;
@@ -1024,18 +1024,18 @@ static ssize_t store_boost(struct cpufreq_sayactivex_tunables *tunables,
 	tunables->boost_val = val;
 
 	if (tunables->boost_val) {
-		trace_cpufreq_sayactivex_boost("on");
+		trace_cpufreq_frankenstein_boost("on");
 		if (!tunables->boosted)
-			cpufreq_sayactivex_boost(tunables);
+			cpufreq_frankenstein_boost(tunables);
 	} else {
 		tunables->boostpulse_endtime = ktime_to_us(ktime_get());
-		trace_cpufreq_sayactivex_unboost("off");
+		trace_cpufreq_frankenstein_unboost("off");
 	}
 
 	return count;
 }
 
-static ssize_t store_boostpulse(struct cpufreq_sayactivex_tunables *tunables,
+static ssize_t store_boostpulse(struct cpufreq_frankenstein_tunables *tunables,
 				const char *buf, size_t count)
 {
 	int ret;
@@ -1047,19 +1047,19 @@ static ssize_t store_boostpulse(struct cpufreq_sayactivex_tunables *tunables,
 
 	tunables->boostpulse_endtime = ktime_to_us(ktime_get()) +
 		tunables->boostpulse_duration_val;
-	trace_cpufreq_sayactivex_boost("pulse");
+	trace_cpufreq_frankenstein_boost("pulse");
 	if (!tunables->boosted)
-		cpufreq_sayactivex_boost(tunables);
+		cpufreq_frankenstein_boost(tunables);
 	return count;
 }
 
-static ssize_t show_boostpulse_duration(struct cpufreq_sayactivex_tunables
+static ssize_t show_boostpulse_duration(struct cpufreq_frankenstein_tunables
 		*tunables, char *buf)
 {
 	return sprintf(buf, "%d\n", tunables->boostpulse_duration_val);
 }
 
-static ssize_t store_boostpulse_duration(struct cpufreq_sayactivex_tunables
+static ssize_t store_boostpulse_duration(struct cpufreq_frankenstein_tunables
 		*tunables, const char *buf, size_t count)
 {
 	int ret;
@@ -1073,7 +1073,7 @@ static ssize_t store_boostpulse_duration(struct cpufreq_sayactivex_tunables
 	return count;
 }
 
-static ssize_t store_touchboostpulse(struct cpufreq_sayactivex_tunables
+static ssize_t store_touchboostpulse(struct cpufreq_frankenstein_tunables
 		*tunables, const char *buf, size_t count)
 {
 	int ret;
@@ -1085,19 +1085,19 @@ static ssize_t store_touchboostpulse(struct cpufreq_sayactivex_tunables
 
 	tunables->touchboostpulse_endtime = ktime_to_us(ktime_get())
 				+ tunables->touchboostpulse_duration_val;
-	trace_cpufreq_sayactivex_boost("pulse");
-	cpufreq_sayactivex_touchboost();
+	trace_cpufreq_frankenstein_boost("pulse");
+	cpufreq_frankenstein_touchboost();
 	return count;
 }
 
-static ssize_t show_touchboostpulse_duration(struct cpufreq_sayactivex_tunables
+static ssize_t show_touchboostpulse_duration(struct cpufreq_frankenstein_tunables
 		*tunables, char *buf)
 {
 	return sprintf(buf, "%d\n", tunables->touchboostpulse_duration_val);
 }
 
 static ssize_t store_touchboostpulse_duration(
-	struct cpufreq_sayactivex_tunables *tunables,
+	struct cpufreq_frankenstein_tunables *tunables,
 	const char *buf, size_t count)
 {
 	int ret;
@@ -1111,13 +1111,13 @@ static ssize_t store_touchboostpulse_duration(
 	return count;
 }
 
-static ssize_t show_io_is_busy(struct cpufreq_sayactivex_tunables *tunables,
+static ssize_t show_io_is_busy(struct cpufreq_frankenstein_tunables *tunables,
 		char *buf)
 {
 	return sprintf(buf, "%u\n", tunables->io_is_busy);
 }
 
-static ssize_t store_io_is_busy(struct cpufreq_sayactivex_tunables *tunables,
+static ssize_t store_io_is_busy(struct cpufreq_frankenstein_tunables *tunables,
 		const char *buf, size_t count)
 {
 	int ret;
@@ -1219,7 +1219,7 @@ static struct freq_attr touchboostpulse_gov_pol =
 	__ATTR(touchboostpulse, 0200, NULL, store_touchboostpulse_gov_pol);
 
 /* One Governor instance for entire system */
-static struct attribute *sayactivex_attributes_gov_sys[] = {
+static struct attribute *frankenstein_attributes_gov_sys[] = {
 	&target_loads_gov_sys.attr,
 	&above_hispeed_delay_gov_sys.attr,
 	&hispeed_freq_gov_sys.attr,
@@ -1237,13 +1237,13 @@ static struct attribute *sayactivex_attributes_gov_sys[] = {
 	NULL,
 };
 
-static struct attribute_group sayactivex_attr_group_gov_sys = {
-	.attrs = sayactivex_attributes_gov_sys,
-	.name = "sayactivex",
+static struct attribute_group frankenstein_attr_group_gov_sys = {
+	.attrs = frankenstein_attributes_gov_sys,
+	.name = "frankenstein",
 };
 
 /* Per policy governor instance */
-static struct attribute *sayactivex_attributes_gov_pol[] = {
+static struct attribute *frankenstein_attributes_gov_pol[] = {
 	&target_loads_gov_pol.attr,
 	&above_hispeed_delay_gov_pol.attr,
 	&hispeed_freq_gov_pol.attr,
@@ -1261,43 +1261,43 @@ static struct attribute *sayactivex_attributes_gov_pol[] = {
 	NULL,
 };
 
-static struct attribute_group sayactivex_attr_group_gov_pol = {
-	.attrs = sayactivex_attributes_gov_pol,
-	.name = "sayactivex",
+static struct attribute_group frankenstein_attr_group_gov_pol = {
+	.attrs = frankenstein_attributes_gov_pol,
+	.name = "frankenstein",
 };
 
 static struct attribute_group *get_sysfs_attr(void)
 {
 	if (have_governor_per_policy())
-		return &sayactivex_attr_group_gov_pol;
+		return &frankenstein_attr_group_gov_pol;
 	else
-		return &sayactivex_attr_group_gov_sys;
+		return &frankenstein_attr_group_gov_sys;
 }
 
-static int cpufreq_sayactivex_idle_notifier(struct notifier_block *nb,
+static int cpufreq_frankenstein_idle_notifier(struct notifier_block *nb,
 					     unsigned long val,
 					     void *data)
 {
 	switch (val) {
 	case IDLE_START:
-		cpufreq_sayactivex_idle_start();
+		cpufreq_frankenstein_idle_start();
 		break;
 	case IDLE_END:
-		cpufreq_sayactivex_idle_end();
+		cpufreq_frankenstein_idle_end();
 		break;
 	}
 
 	return 0;
 }
 
-static struct notifier_block cpufreq_sayactivex_idle_nb = {
-	.notifier_call = cpufreq_sayactivex_idle_notifier,
+static struct notifier_block cpufreq_frankenstein_idle_nb = {
+	.notifier_call = cpufreq_frankenstein_idle_notifier,
 };
 
 static void __cpuinit early_suspend_offline_cpus(struct early_suspend *h)
 {
 	#ifdef GOVDEBUG
-	printk("entered early_suspend handler in sayactivex");
+	printk("entered early_suspend handler in frankenstein");
 	#else
 	unsigned int cpu;
 	for_each_possible_cpu(cpu)
@@ -1314,7 +1314,7 @@ static void __cpuinit early_suspend_offline_cpus(struct early_suspend *h)
 static void __cpuinit late_resume_online_cpus(struct early_suspend *h)
 {
 	#ifdef GOVDEBUG
-	printk("entered late_resume handler in sayactivex");
+	printk("entered late_resume handler in frankenstein");
 	#else
 	unsigned int cpu;
 	
@@ -1332,14 +1332,14 @@ static struct early_suspend hotplug_auxcpus_desc __refdata = {
 	.resume = late_resume_online_cpus,
 };
 
-static int cpufreq_governor_sayactivex(struct cpufreq_policy *policy,
+static int cpufreq_governor_frankenstein(struct cpufreq_policy *policy,
 		unsigned int event)
 {
 	int rc;
 	unsigned int j;
-	struct cpufreq_sayactivex_cpuinfo *pcpu;
+	struct cpufreq_frankenstein_cpuinfo *pcpu;
 	struct cpufreq_frequency_table *freq_table;
-	struct cpufreq_sayactivex_tunables *tunables;
+	struct cpufreq_frankenstein_tunables *tunables;
 	unsigned long flags;
 
 	if (have_governor_per_policy())
@@ -1399,7 +1399,7 @@ static int cpufreq_governor_sayactivex(struct cpufreq_policy *policy,
 		}
 
 		if (!policy->governor->initialized) {
-			idle_notifier_register(&cpufreq_sayactivex_idle_nb);
+			idle_notifier_register(&cpufreq_frankenstein_idle_nb);
 			cpufreq_register_notifier(&cpufreq_notifier_block,
 					CPUFREQ_TRANSITION_NOTIFIER);
 			register_early_suspend(&hotplug_auxcpus_desc);
@@ -1412,7 +1412,7 @@ static int cpufreq_governor_sayactivex(struct cpufreq_policy *policy,
 			if (policy->governor->initialized == 1) {
 				cpufreq_unregister_notifier(&cpufreq_notifier_block,
 						CPUFREQ_TRANSITION_NOTIFIER);
-				idle_notifier_unregister(&cpufreq_sayactivex_idle_nb);
+				idle_notifier_unregister(&cpufreq_frankenstein_idle_nb);
 				unregister_early_suspend(&hotplug_auxcpus_desc);
 			}
 
@@ -1448,7 +1448,7 @@ static int cpufreq_governor_sayactivex(struct cpufreq_policy *policy,
 			down_write(&pcpu->enable_sem);
 			del_timer_sync(&pcpu->cpu_timer);
 			del_timer_sync(&pcpu->cpu_slack_timer);
-			cpufreq_sayactivex_timer_start(tunables, j);
+			cpufreq_frankenstein_timer_start(tunables, j);
 			pcpu->governor_enabled = 1;
 			up_write(&pcpu->enable_sem);
 		}
@@ -1506,7 +1506,7 @@ static int cpufreq_governor_sayactivex(struct cpufreq_policy *policy,
 				down_write(&pcpu->enable_sem);
 				del_timer_sync(&pcpu->cpu_timer);
 				del_timer_sync(&pcpu->cpu_slack_timer);
-				cpufreq_sayactivex_timer_start(tunables, j);
+				cpufreq_frankenstein_timer_start(tunables, j);
 				up_write(&pcpu->enable_sem);
 			}
 
@@ -1517,17 +1517,17 @@ static int cpufreq_governor_sayactivex(struct cpufreq_policy *policy,
 	return 0;
 }
 
-#ifndef CONFIG_CPU_FREQ_DEFAULT_GOV_SAYACTIVEX
+#ifndef CONFIG_CPU_FREQ_DEFAULT_GOV_FRANKENSTEIN
 static
 #endif
-struct cpufreq_governor cpufreq_gov_sayactivex = {
-	.name = "sayactivex",
-	.governor = cpufreq_governor_sayactivex,
+struct cpufreq_governor cpufreq_gov_frankenstein = {
+	.name = "frankenstein",
+	.governor = cpufreq_governor_frankenstein,
 	.max_transition_latency = 10000000,
 	.owner = THIS_MODULE,
 };
 
-static void cpufreq_sayactivex_nop_timer(unsigned long data)
+static void cpufreq_frankenstein_nop_timer(unsigned long data)
 {
 }
 
@@ -1539,20 +1539,20 @@ static struct kobject *get_governor_parent_kobj(struct cpufreq_policy *policy)
 		return cpufreq_global_kobject;
 }
 
-static int __init cpufreq_sayactivex_init(void)
+static int __init cpufreq_frankenstein_init(void)
 {
 	unsigned int i;
-	struct cpufreq_sayactivex_cpuinfo *pcpu;
+	struct cpufreq_frankenstein_cpuinfo *pcpu;
 	struct sched_param param = { .sched_priority = MAX_RT_PRIO-1 };
 
 	/* Initalize per-cpu timers */
 	for_each_possible_cpu(i) {
 		pcpu = &per_cpu(cpuinfo, i);
 		init_timer_deferrable(&pcpu->cpu_timer);
-		pcpu->cpu_timer.function = cpufreq_sayactivex_timer;
+		pcpu->cpu_timer.function = cpufreq_frankenstein_timer;
 		pcpu->cpu_timer.data = i;
 		init_timer(&pcpu->cpu_slack_timer);
-		pcpu->cpu_slack_timer.function = cpufreq_sayactivex_nop_timer;
+		pcpu->cpu_slack_timer.function = cpufreq_frankenstein_nop_timer;
 		spin_lock_init(&pcpu->load_lock);
 		spin_lock_init(&pcpu->target_freq_lock);
 		init_rwsem(&pcpu->enable_sem);
@@ -1561,8 +1561,8 @@ static int __init cpufreq_sayactivex_init(void)
 	spin_lock_init(&speedchange_cpumask_lock);
 	mutex_init(&gov_lock);
 	speedchange_task =
-		kthread_create(cpufreq_sayactivex_speedchange_task, NULL,
-			       "cfsayactivex");
+		kthread_create(cpufreq_frankenstein_speedchange_task, NULL,
+			       "cffrankenstein");
 	if (IS_ERR(speedchange_task))
 		return PTR_ERR(speedchange_task);
 
@@ -1572,25 +1572,25 @@ static int __init cpufreq_sayactivex_init(void)
 	/* NB: wake up so the thread does not look hung to the freezer */
 	wake_up_process(speedchange_task);
 
-	return cpufreq_register_governor(&cpufreq_gov_sayactivex);
+	return cpufreq_register_governor(&cpufreq_gov_frankenstein);
 }
 
-#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_SAYACTIVEX
-fs_initcall(cpufreq_sayactivex_init);
+#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_FRANKENSTEIN
+fs_initcall(cpufreq_frankenstein_init);
 #else
-module_init(cpufreq_sayactivex_init);
+module_init(cpufreq_frankenstein_init);
 #endif
 
-static void __exit cpufreq_sayactivex_exit(void)
+static void __exit cpufreq_frankenstein_exit(void)
 {
-	cpufreq_unregister_governor(&cpufreq_gov_sayactivex);
+	cpufreq_unregister_governor(&cpufreq_gov_frankenstein);
 	kthread_stop(speedchange_task);
 	put_task_struct(speedchange_task);
 }
 
-module_exit(cpufreq_sayactivex_exit);
+module_exit(cpufreq_frankenstein_exit);
 
 MODULE_AUTHOR("Mike Chan <mike@android.com>");
-MODULE_DESCRIPTION("'cpufreq_sayactivex' - A cpufreq governor for "
+MODULE_DESCRIPTION("'cpufreq_frankenstein' - A cpufreq governor for "
 	"Latency sensitive workloads");
 MODULE_LICENSE("GPL");
