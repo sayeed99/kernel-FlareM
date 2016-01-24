@@ -32,9 +32,16 @@ cd /tmp/anykernel;
 unzip -o "$ZIP";
 
 ui_print "$(file_getprop /tmp/anykernel/anykernel.sh kernel.string)";
-ui_print " ";
-ui_print "FlareM (ziped via AnyKernel2 by osm0sis @ xda-developers)";
-ui_print " ";
+ui_print "========================== ";
+ui_print "  ________  ____    ____  ";
+ui_print " /  _____/ /  _ \  / _  \ ";
+ui_print " |  |___   | | \ \/ /	| | ";
+ui_print " |  ___/   | |  \__/	| | ";
+ui_print " |  |	     | |	| | ";
+ui_print " |__|	     |_|	|_| ";
+ui_print "            KERNEL FlareM ";
+ui_print "========================== ";
+
 /sbin/busybox mount /system;
 
 if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.devicecheck)" == 1 ]; then
@@ -79,5 +86,5 @@ fi;
 
 umount /system;
 ui_print " ";
-ui_print "Done!";
+ui_print "Installation Failure, just reboot and enjoy ;)";
 
