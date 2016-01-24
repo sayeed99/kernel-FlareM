@@ -35,10 +35,10 @@ ui_print "$(file_getprop /tmp/anykernel/anykernel.sh kernel.string)";
 ui_print "========================== ";
 ui_print "  ________  ____    ____  ";
 ui_print " /  _____/ /  _ \  / _  \ ";
-ui_print " |  |___   | | \ \/ /	| | ";
-ui_print " |  ___/   | |  \__/	| | ";
-ui_print " |  |	     | |	| | ";
-ui_print " |__|LARE  |_|	|_| ";
+ui_print " |  |___   | | \ \/ / | | ";
+ui_print " |  ___/   | |  \__/  | | ";
+ui_print " |  |      | |        | | ";
+ui_print " |__|LARE  |_|        |_| ";
 ui_print "            KERNEL FlareM ";
 ui_print "========================== ";
 
