@@ -38,7 +38,7 @@ ui_print " /  _____/ /  _ \  / _  \ ";
 ui_print " |  |___   | | \ \/ /	| | ";
 ui_print " |  ___/   | |  \__/	| | ";
 ui_print " |  |	     | |	| | ";
-ui_print " |__|	     |_|	|_| ";
+ui_print " |__|LARE  |_|	|_| ";
 ui_print "            KERNEL FlareM ";
 ui_print "========================== ";
 
