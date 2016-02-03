@@ -166,7 +166,7 @@ CCACHE := ccache
 CARCH := x86_64
 
 #Toolchain
-GCC :=../x86_64-linux-linaro4.9/bin/x86_64-linux-
+GCC :=../x86_64-toolchain-GCC-5.3.0/bin/x86_64-linux-
 
 
 # SUBARCH tells the usermode build what the underlying arch is.  That is set
