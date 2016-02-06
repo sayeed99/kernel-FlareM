@@ -1,20 +1,5 @@
-config ASMP
-	bool "Multi-core automatic hotplug support"
-	depends on SMP && HOTPLUG_CPU
-	default y
-	help
-	  Automatically hotplugs the multiple cpu cores on and off
-	  based on cpu load and suspend state
-
 config ALUCARD_HOTPLUG
 	bool "Enable alucard-hotplug cpu hotplug driver"
 	default y
 	help
 	  Alucard-hotplug cpu hotplug driver
-
-config INTELLI_PLUG
-	   bool "Hotplug for Razor Reborn"
-	   depends on SMP
-	   default y
-	   help
-		 This enables kernel based multi core control.

@@ -12,6 +12,4 @@ CFLAGS_REMOVE_ftrace.o = -pg
 CFLAGS_REMOVE_early_printk.o = -pg
 endif
 
-obj-$(CONFIG_ASMP) 		+= autosmp.o
 obj-$(CONFIG_ALUCARD_HOTPLUG) 		+= alucard_hotplug.o
-obj-$(CONFIG_INTELLI_PLUG) += intelli_plug.o
