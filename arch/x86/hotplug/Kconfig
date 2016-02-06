@@ -11,3 +11,10 @@ config ALUCARD_HOTPLUG
 	default y
 	help
 	  Alucard-hotplug cpu hotplug driver
+
+config INTELLI_PLUG
+	   bool "Hotplug for Razor Reborn"
+	   depends on SMP
+	   default y
+	   help
+		 This enables kernel based multi core control.
