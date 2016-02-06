@@ -917,6 +917,7 @@ config SCHED_MC
 	  Multi-core scheduler support improves the CPU scheduler's decision
 	  making when dealing with multi-core CPU chips at a cost of slightly
 	  increased overhead in some places. If unsure say N here.
+
 config ASMP
 	bool "Multi-core automatic hotplug support"
 	depends on SMP && HOTPLUG_CPU
@@ -924,6 +925,12 @@ config ASMP
 	help
 	  Automatically hotplugs the multiple cpu cores on and off
 	  based on cpu load and suspend state
+
+config ALUCARD_HOTPLUG
+	bool "Enable alucard-hotplug cpu hotplug driver"
+	default y
+	help
+	  Alucard-hotplug cpu hotplug driver
 
 config CPU_CONCURRENCY
 	bool "CPU ConCurency (CC)"
