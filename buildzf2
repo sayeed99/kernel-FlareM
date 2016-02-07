@@ -12,7 +12,7 @@ echo "Applying Build Settings"
 #CONFIGS
 export SLEEP=1
 echo "Setting CPU Cores/Threads"
-#export CPUS=`nproc`
+export CPUS=`nproc`
 echo "Setting Version Number"
 export VER=$1
 echo "Setting Extra Version"
@@ -45,7 +45,7 @@ else
    sleep $SLEEP
 fi
 wmctrl -r :ACTIVE: -N "Compiling FlareM Kernel"
-make V=1 $EV -j$CPUS
+make $EV -j$CPUS
 
 if [ -f $BZIMAGE ];
 then
