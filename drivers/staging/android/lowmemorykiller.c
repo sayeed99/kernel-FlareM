@@ -40,14 +40,11 @@
 #include <linux/swap.h>
 #include <linux/rcupdate.h>
 #include <linux/notifier.h>
-<<<<<<< HEAD
-=======
 #include <linux/mutex.h>
 #include <linux/delay.h>
 
 #define CREATE_TRACE_POINTS
 #include "trace/lowmemorykiller.h"
->>>>>>> e56ef89... lowmemorykiller: update to Simple Stream's version
 
 static uint32_t lowmem_debug_level = 1;
 static short lowmem_adj[6] = {
@@ -73,10 +70,6 @@ static unsigned long lowmem_deathpending_timeout;
 			pr_info(x);			\
 	} while (0)
 
-<<<<<<< HEAD
-static int is4gDram = 0;
-extern int Read_TOTAL_DRAM(void);
-=======
 static bool protected(char *comm)
 {
  	if (strcmp(comm, "ndroid.systemui") == 0 || strcmp(comm, "system:ui") == 0) {
@@ -103,7 +96,6 @@ static int test_task_flag(struct task_struct *p, int flag)
 }
 
 static DEFINE_MUTEX(scan_mutex);
->>>>>>> e56ef89... lowmemorykiller: update to Simple Stream's version
 
 static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 {
@@ -118,15 +110,6 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	int selected_tasksize = 0;
 	short selected_oom_score_adj;
 	int array_size = ARRAY_SIZE(lowmem_adj);
-<<<<<<< HEAD
-	int other_free = global_page_state(NR_FREE_PAGES) - totalreserve_pages;
-	int other_file = global_page_state(NR_FILE_PAGES) -
-						global_page_state(NR_SHMEM);
-	// BZ7024>>
-	int dma32_free = 0, dma32_file = 0;
-	struct zone *zone;
-	// BZ7024<<
-=======
 	int other_free;
 	int other_file;
 	unsigned long nr_to_scan = sc->nr_to_scan;
@@ -158,7 +141,6 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	if (other_file < 0)
 		other_file = 0;
 
->>>>>>> e56ef89... lowmemorykiller: update to Simple Stream's version
 	if (lowmem_adj_size < array_size)
 		array_size = lowmem_adj_size;
 	if (lowmem_minfree_size < array_size)
@@ -201,15 +183,8 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 		if (test_task_flag(tsk, TIF_MM_RELEASED))
 			continue;
 
-<<<<<<< HEAD
-		if (test_tsk_thread_flag(p, TIF_MEMDIE)) {
-			if (time_before_eq(jiffies,
-				lowmem_deathpending_timeout)) {
-				task_unlock(p);
-=======
 		if (time_before_eq(jiffies, lowmem_deathpending_timeout)) {
 			if (test_task_flag(tsk, TIF_MEMDIE)) {
->>>>>>> e56ef89... lowmemorykiller: update to Simple Stream's version
 				rcu_read_unlock();
 				/* give the system time to free up the memory */
 				if (!same_thread_group(current, tsk))
@@ -231,8 +206,6 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 			task_unlock(p);
 			continue;
 		}
-<<<<<<< HEAD
-=======
 		if (fatal_signal_pending(p) ||
 				((p->flags & PF_EXITING) &&
 					test_tsk_thread_flag(p, TIF_MEMDIE))) {
@@ -249,7 +222,6 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 			task_unlock(p);
 			continue;
 		}
->>>>>>> e56ef89... lowmemorykiller: update to Simple Stream's version
 		tasksize = get_mm_rss(p->mm);
 		task_unlock(p);
 		if (tasksize <= 0)
@@ -268,13 +240,10 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 			     p->comm, p->pid, oom_score_adj, tasksize);
 	}
 	if (selected) {
-<<<<<<< HEAD
-=======
 		long cache_size = other_file * (long)(PAGE_SIZE / 1024);
 		long cache_limit = minfree * (long)(PAGE_SIZE / 1024);
 		long free = other_free * (long)(PAGE_SIZE / 1024);
 		trace_lowmemory_kill(selected, cache_size, cache_limit, free);
->>>>>>> e56ef89... lowmemorykiller: update to Simple Stream's version
 		lowmem_print(1, "Killing '%s' (%d), adj %hd,\n" \
 				"   to free %ldkB on behalf of '%s' (%d) because\n" \
 				"   cache %ldkB is below limit %ldkB for oom_score_adj %hd\n" \
@@ -290,16 +259,12 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 		send_sig(SIGKILL, selected, 0);
 		set_tsk_thread_flag(selected, TIF_MEMDIE);
 		rem -= selected_tasksize;
-<<<<<<< HEAD
-	}
-=======
 		rcu_read_unlock();
 		/* give the system time to free up the memory */
 		msleep_interruptible(20);
 	} else
 		rcu_read_unlock();
 
->>>>>>> e56ef89... lowmemorykiller: update to Simple Stream's version
 	lowmem_print(4, "lowmem_shrink %lu, %x, return %d\n",
 		     nr_to_scan, sc->gfp_mask, rem);
 	mutex_unlock(&scan_mutex);
