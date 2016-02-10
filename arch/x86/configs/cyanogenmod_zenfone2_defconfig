@@ -3,6 +3,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Linux/x86_64 3.10.20 Kernel Configuration
 =======
 <<<<<<< HEAD
@@ -19,6 +20,9 @@
 >>>>>>> c75b394... fix previous cherry-pick
 =======
 >>>>>>> ae35efa... Revert "fix previous cherry-pick"
+=======
+# Linux/x86_64 3.10.20_FlareM_v9 Kernel Configuration
+>>>>>>> dcb6952... regen : defconfig
 #
 CONFIG_64BIT=y
 CONFIG_X86_64=y
