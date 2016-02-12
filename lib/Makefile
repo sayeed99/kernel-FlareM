@@ -45,8 +45,18 @@ lib-$(CONFIG_RWSEM_GENERIC_SPINLOCK) += rwsem-spinlock.o
 lib-$(CONFIG_RWSEM_XCHGADD_ALGORITHM) += rwsem.o
 lib-$(CONFIG_PERCPU_RWSEM) += percpu-rwsem.o
 
+<<<<<<< HEAD
 GCOV_PROFILE_hweight.o := n
+=======
+<<<<<<< HEAD
+>>>>>>> af70f53... lto: Disable LTO for hweight functions
 CFLAGS_hweight.o = $(subst $(quote),,$(CONFIG_ARCH_HWEIGHT_CFLAGS))
+=======
+GCOV_PROFILE_hweight.o := n
+CFLAGS_hweight.o = $(subst $(quote),,$(CONFIG_ARCH_HWEIGHT_CFLAGS)) \
+		   $(DISABLE_LTO)
+
+>>>>>>> 6c47634... lto: Disable LTO for hweight functions
 obj-$(CONFIG_GENERIC_HWEIGHT) += hweight.o
 
 obj-$(CONFIG_BTREE) += btree.o
