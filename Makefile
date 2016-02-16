@@ -166,7 +166,11 @@ CCACHE := ccache
 CARCH := x86_64
 
 #Toolchain
+<<<<<<< HEAD
 GCC :=../x86_64-linux-linaro4.9/bin/x86_64-linux-
+=======
+GCC :=../linaro-5.2.0/bin/x86_64-linux-
+>>>>>>> a5fd98e... Enable more flags and re-enable CPU OC to test
 
 
 # SUBARCH tells the usermode build what the underlying arch is.  That is set
@@ -259,8 +263,8 @@ HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -Ofast -ffast-math
 HOSTCXXFLAGS = -Ofast -march=atom -fgcse-las
 >>>>>>> 73a645f... add more flags for atom
 ifeq ($(ENABLE_GRAPHITE),true)
-HOSTCXXFLAGS += -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
-HOSTCFLAGS += -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
+HOSTCXXFLAGS += -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-strip-mine -floop-block -fgraphite-identity -floop-block -floop-strip-mine -ftree-loop-distribution -ftree-loop-linear
+HOSTCFLAGS += -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-strip-mine -floop-block -floop-block -floop-strip-mine -fgraphite-identity -ftree-loop-distribution -ftree-loop-linear -ffast-math
 endif
 
 # Decide whether to build built-in, modular, or both.
@@ -351,8 +355,8 @@ CPP		= $(CC) -E
 # Check to see if the kernel is being built inline with saber host toolchains for graphite flags for CC/CPP
 # This get's passed to the host since we use $(CROSS_COMPILE)gcc
 ifeq ($(ENABLE_GRAPHITE),true)
-	CC += -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
-	CPP += -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
+	CC += -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-strip-mine -floop-block
+	CPP += -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-strip-mine -floop-block
 endif
 ifdef CONFIG_LTO
 AR		= $(CROSS_COMPILE)gcc-ar
@@ -372,7 +376,7 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-KERNEL_FLAGS 	=  -Ofast -fgcse-sm -fgcse-las -fsched-spec-load -fforce-addr -ffast-math -fsingle-precision-constan -ftree-vectorize -mvectorize-with-neon-quad -funroll-loops -ftree-loop-im -ftree-loop-ivcanon -fmodulo-sched -fmodulo-sched-allow-regmoves -fivopts -fopenmp -fopenmp-simd -fsimd-cost-model=unlimited -fgraphite
+KERNEL_FLAGS 	=  -Ofast -fgcse-sm -fgcse-las -fsched-spec-load -fforce-addr -ffast-math -fsingle-precision-constan -ftree-vectorize -mvectorize-with-neon-quad -funroll-loops -ftree-loop-im -ftree-loop-ivcanon -fmodulo-sched -fmodulo-sched-allow-regmoves -fivopts -fopenmp -fopenmp-simd -fsimd-cost-model=unlimited -fgraphite -fgraphite-identity -floop-block -floop-strip-mine -ftree-loop-distribution -ftree-loop-linear
 MOD_FLAGS 	= -DMODULE $(KERNEL_FLAGS)
 CFLAGS_MODULE 	= $(MODFLAGS) -Ofast
 AFLAGS_MODULE 	= $(MODFLAGS) -Ofast
@@ -405,7 +409,7 @@ KBUILD_CPPFLAGS := -D__KERNEL__
 # LINARO OPT
 #
 CFLAGS_MODULO 	= -fmodulo-sched -fmodulo-sched-allow-regmoves
-KERNEL_MODS 	= $(CFLAGS_MODULO) -Ofast
+KERNEL_MODS 	= $(CFLAGS_MODULO) -Ofast -fgraphite-identity -floop-block -floop-strip-mine -ftree-loop-distribution -ftree-loop-linear
 KBUILD_CFLAGS   := $(ANDROID_TOOLCHAIN_FLAGS) \
 		   -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common -Wno-unused-value \
