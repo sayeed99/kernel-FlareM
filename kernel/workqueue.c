@@ -296,12 +296,15 @@ static DEFINE_HASHTABLE(unbound_pool_hash, UNBOUND_POOL_HASH_ORDER);
 static struct workqueue_attrs *unbound_std_wq_attrs[NR_STD_WORKER_POOLS];
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 /* I: attributes used when instantiating ordered pools on demand */
 static struct workqueue_attrs *ordered_wq_attrs[NR_STD_WORKER_POOLS];
 
 =======
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> f0b8a45... a few more
 /* I: attributes used when instantiating ordered pools on demand */
 static struct workqueue_attrs *ordered_wq_attrs[NR_STD_WORKER_POOLS];
 
@@ -314,8 +317,11 @@ static bool wq_power_efficient;
 
 module_param_named(power_efficient, wq_power_efficient, bool, 0644);
 
+<<<<<<< HEAD
 >>>>>>> ac14f13... workqueues: Introduce new flag WQ_POWER_EFFICIENT for power oriented workqueues
 >>>>>>> e53d191... workqueues: Introduce new flag WQ_POWER_EFFICIENT for power oriented workqueues
+=======
+>>>>>>> f0b8a45... a few more
 struct workqueue_struct *system_wq __read_mostly;
 EXPORT_SYMBOL(system_wq);
 struct workqueue_struct *system_highpri_wq __read_mostly;
