@@ -1,5 +1,5 @@
 VERSION = 3
-PATCHLEVEL = 96
+PATCHLEVEL = 10
 SUBLEVEL = 20
 EXTRAVERSION = _FlareM_v9
 NAME = TOSSUG Baby Fish
@@ -397,16 +397,6 @@ KBUILD_CPPFLAGS := -D__KERNEL__
 CFLAGS_MODULO 	= -fmodulo-sched -fmodulo-sched-allow-regmoves
 KERNEL_MODS 	= $(CFLAGS_MODULO)
 KBUILD_CFLAGS   := $(ANDROID_TOOLCHAIN_FLAGS) \
-<<<<<<< HEAD
-		   -Wall -DNDEBUG -Wundef -Wstrict-prototypes -Wno-trigraphs \
-		   -fno-strict-aliasing -fno-common \
-		   -Werror-implicit-function-declaration \
-		   -Wno-format-security \
-		   -fno-delete-null-pointer-checks \
-		   -Wno-sizeof-pointer-memaccess \
-           	   -ftree-vectorize \
-		   -pipe \
-=======
 		   -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common -Wno-unused-value \
 		   -Werror-implicit-function-declaration -Wno-uninitialized \
@@ -417,7 +407,6 @@ KBUILD_CFLAGS   := $(ANDROID_TOOLCHAIN_FLAGS) \
 		   -fno-aggressive-loop-optimizations \
 		   -fno-delete-null-pointer-checks -fno-pic -Wno-maybe-uninitialized \
  		   -std=gnu89 \
->>>>>>> 11e7cdf... Makefiles edits
 		   $(KERNEL_MODS)
 
 KBUILD_AFLAGS_KERNEL :=
