@@ -1,7 +1,7 @@
 VERSION = 3
 PATCHLEVEL = 10
-SUBLEVEL = 20
-EXTRAVERSION = _FlareM_v9
+SUBLEVEL = 96
+EXTRAVERSION =
 NAME = TOSSUG Baby Fish
 
 # *DOCUMENTATION*
@@ -166,11 +166,7 @@ CCACHE := ccache
 CARCH := x86_64
 
 #Toolchain
-<<<<<<< HEAD
-GCC :=../x86_64-linux-linaro4.9/bin/x86_64-linux-
-=======
 GCC :=../linaro-5.2.0/bin/x86_64-linux-
->>>>>>> a5fd98e... Enable more flags and re-enable CPU OC to test
 
 
 # SUBARCH tells the usermode build what the underlying arch is.  That is set
@@ -255,13 +251,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = $(CCACHE) gcc
 HOSTCXX      = $(CCACHE) g++
-<<<<<<< HEAD
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -Ofast -fomit-frame-pointer -fgcse-las
-HOSTCXXFLAGS = -Ofast -fgcse-las
-=======
 HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -Ofast -ffast-math -fomit-frame-pointer -fgcse-las -std=gnu89
 HOSTCXXFLAGS = -Ofast -march=atom -fgcse-las
->>>>>>> 73a645f... add more flags for atom
 ifeq ($(ENABLE_GRAPHITE),true)
 HOSTCXXFLAGS += -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-strip-mine -floop-block -fgraphite-identity -floop-block -floop-strip-mine -ftree-loop-distribution -ftree-loop-linear
 HOSTCFLAGS += -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-strip-mine -floop-block -floop-block -floop-strip-mine -fgraphite-identity -ftree-loop-distribution -ftree-loop-linear -ffast-math
@@ -668,6 +659,8 @@ ifndef CONFIG_FUNCTION_TRACER
 KBUILD_CFLAGS	+= -fomit-frame-pointer
 endif
 endif
+
+KBUILD_CFLAGS   += $(call cc-option, -fno-var-tracking-assignments)
 
 ifdef CONFIG_DEBUG_INFO
 KBUILD_CFLAGS	+= -g
