@@ -213,6 +213,7 @@ config CPU_FREQ_DEFAULT_GOV_HOTPLUG
 	  governor. If unsure have a look at the help section of the
 	  driver. Fallback governor will be the performance governor.
 
+<<<<<<< HEAD
 config CPU_FREQ_DEFAULT_GOV_INTEL
 	bool "intel"
 	select CPU_FREQ_GOV_INTEL
@@ -223,6 +224,8 @@ config CPU_FREQ_DEFAULT_GOV_INTEL
 	  'intel' governor for better perfromance and power with Intel
 	  mobile platforms.
 
+=======
+>>>>>>> parent of a1a07a9... zen-tune: Implement zen-tune v4
 endchoice
 
 config CPU_FREQ_GOV_BIOSHOCK
