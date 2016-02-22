@@ -21,8 +21,6 @@ source "drivers/gpu/vga/Kconfig"
 
 source "drivers/gpu/drm/Kconfig"
 
-source "drivers/video/displaylink/Kconfig"
-
 source "drivers/gpu/host1x/Kconfig"
 
 config VGASTATE
@@ -2515,3 +2513,5 @@ config FB_SSD1307
 	  OLED controller over I2C.
 
 endmenu
+
+source "drivers/video/displaylink/Kconfig"
