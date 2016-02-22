@@ -213,8 +213,6 @@ config CPU_FREQ_DEFAULT_GOV_HOTPLUG
 	  governor. If unsure have a look at the help section of the
 	  driver. Fallback governor will be the performance governor.
 
-<<<<<<< HEAD
-=======
 config CPU_FREQ_DEFAULT_GOV_INTEL
 	bool "intel"
 	select CPU_FREQ_GOV_INTEL
@@ -224,7 +222,6 @@ config CPU_FREQ_DEFAULT_GOV_INTEL
 	  loading your cpufreq low-level hardware driver, using the
 	  'intel' governor for better perfromance and power with Intel
 	  mobile platforms.
->>>>>>> 67a58e1... cpufreq: Added intel cpu governor
 
 endchoice
 
@@ -425,8 +422,6 @@ config CPU_FREQ_GOV_CONSERVATIVE
 
 	  If in doubt, say N.
 
-<<<<<<< HEAD
-=======
 config CPU_FREQ_GOV_INTEL
 	tristate "'intel' cpufreq policy governor"
 	help
@@ -447,7 +442,6 @@ config CPU_FREQ_GOV_INTEL
 
 
 
->>>>>>> 67a58e1... cpufreq: Added intel cpu governor
 config GENERIC_CPUFREQ_CPU0
 	tristate "Generic CPU0 cpufreq driver"
 	depends on HAVE_CLK && REGULATOR && PM_OPP && OF
