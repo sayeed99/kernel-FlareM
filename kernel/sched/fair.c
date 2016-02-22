@@ -46,6 +46,14 @@
  * (to see the precise effective timeslice length of your workload,
  *  run vmstat and monitor the context-switches (cs) field)
  */
+<<<<<<< HEAD
+unsigned int sysctl_sched_latency = 5000000ULL;
+unsigned int normalized_sysctl_sched_latency = 5000000ULL;
+=======
+<<<<<<< HEAD
+unsigned int sysctl_sched_latency = 3000000ULL;
+unsigned int normalized_sysctl_sched_latency = 3000000ULL;
+=======
 #ifdef CONFIG_ZEN_INTERACTIVE
 unsigned int sysctl_sched_latency = 3000000ULL;
 unsigned int normalized_sysctl_sched_latency = 3000000ULL;
@@ -53,6 +61,8 @@ unsigned int normalized_sysctl_sched_latency = 3000000ULL;
 unsigned int sysctl_sched_latency = 6000000ULL;
 unsigned int normalized_sysctl_sched_latency = 6000000ULL;
 #endif
+>>>>>>> 7d59ffc... zen-tune: Implement zen-tune v4
+>>>>>>> d6c6d35... zen-tune: Implement zen-tune v4
 
 /*
  * The initial- and re-scaling of tunables is configurable
