@@ -28,7 +28,6 @@ config BUILDTIME_EXTABLE_SORT
 
 menu "General setup"
 
-<<<<<<< HEAD
 config EXPERIMENTAL
 	bool "Prompt for development and/or incomplete code/drivers"
 	---help---
@@ -59,7 +58,7 @@ config EXPERIMENTAL
 	  cause the configurator to present you with fewer choices. If
 	  you say Y here, you will be offered the choice of using features or
 	  drivers that are currently considered to be in the alpha-test phase.
-=======
+
 config ZEN_INTERACTIVE
 	bool "Tune kernel for interactivity"
 	default y
@@ -79,7 +78,6 @@ config ZEN_INTERACTIVE
 
 	  --- CPU Frequency Scaling ---
 	    Ondemand down scaling factor...:   1    ->  10
->>>>>>> d6c6d35... zen-tune: Implement zen-tune v4
 
 config BROKEN
 	bool
