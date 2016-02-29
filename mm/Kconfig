@@ -505,7 +505,8 @@ config FRONTSWAP
 	  If unsure, say Y to enable frontswap.
 
 config ZBUD
-	tristate
+	tristate "Low density storage for compressed pages"
+	depends on ZSWAP
 	default n
 	help
 	  A special purpose allocator for storing compressed pages.
@@ -536,6 +537,7 @@ config ZSWAP
 
 config ZPOOL
 	tristate "Common API for compressed memory storage"
+	depends on ZSWAP
 	default n
 	help
 	  Compressed memory storage API.  This allows using either zbud or
