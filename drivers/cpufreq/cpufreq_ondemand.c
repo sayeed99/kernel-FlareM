@@ -78,6 +78,16 @@ static int should_io_be_busy(void)
 	return 0;
 }
 
+/* Returns the powersave_bias to use such that we only enable powersave_bias until
+ * the desired target frequency meets or exceeds the specified threshold.
+ */
+static bool get_powersave_bias(struct od_dbs_tuners *od_tuners, unsigned int freq) {
+	if (od_tuners->powersave_bias_threshold && freq >= od_tuners->powersave_bias_threshold)
+		return 0;
+	else
+		return od_tuners->powersave_bias;
+}
+
 /*
  * Find right freq to be set now with powersave_bias on.
  * Returns the freq_hi to be used right now and will set freq_hi_jiffies,
@@ -104,7 +114,7 @@ static unsigned int generic_powersave_bias_target(struct cpufreq_policy *policy,
 	cpufreq_frequency_table_target(policy, dbs_info->freq_table, freq_next,
 			relation, &index);
 	freq_req = dbs_info->freq_table[index].frequency;
-	freq_reduc = freq_req * od_tuners->powersave_bias / 1000;
+	freq_reduc = freq_req * get_powersave_bias(od_tuners, freq_req) / 1000;
 	freq_avg = freq_req - freq_reduc;
 
 	/* Find freq bounds for freq_avg in freq_table */
@@ -146,14 +156,15 @@ static void dbs_freq_increase(struct cpufreq_policy *policy, unsigned int freq)
 {
 	struct dbs_data *dbs_data = policy->governor_data;
 	struct od_dbs_tuners *od_tuners = dbs_data->tuners;
+	unsigned int powersave_bias = get_powersave_bias(od_tuners, freq);
 
-	if (od_tuners->powersave_bias)
+	if (powersave_bias)
 		freq = od_ops.powersave_bias_target(policy, freq,
 				CPUFREQ_RELATION_H);
 	else if (policy->cur == policy->max)
 		return;
 
-	__cpufreq_driver_target(policy, freq, od_tuners->powersave_bias ?
+	__cpufreq_driver_target(policy, freq, powersave_bias ?
 			CPUFREQ_RELATION_L : CPUFREQ_RELATION_H);
 }
 
@@ -178,23 +189,27 @@ static void od_check_cpu(int cpu, unsigned int load)
 			dbs_info->rate_mult =
 				od_tuners->sampling_down_factor;
 		dbs_freq_increase(policy, policy->max);
-	} else {
+		
+		} else {
 		/* Calculate the next frequency proportional to load */
-		unsigned int freq_next;
-		freq_next = load * policy->cpuinfo.max_freq / 100;
+		unsigned int freq_next, min_f, max_f;
+
+		min_f = policy->cpuinfo.min_freq;
+		max_f = policy->cpuinfo.max_freq;
+		freq_next = min_f + load * (max_f - min_f) / 100;
 
 		/* No longer fully busy, reset rate_mult */
 		dbs_info->rate_mult = 1;
 
-		if (!od_tuners->powersave_bias) {
+		if (!get_powersave_bias(od_tuners, freq_next)) {
 			__cpufreq_driver_target(policy, freq_next,
-					CPUFREQ_RELATION_L);
+					CPUFREQ_RELATION_C);
 			return;
 		}
 
 		freq_next = od_ops.powersave_bias_target(policy, freq_next,
 					CPUFREQ_RELATION_L);
-		__cpufreq_driver_target(policy, freq_next, CPUFREQ_RELATION_L);
+		__cpufreq_driver_target(policy, freq_next, CPUFREQ_RELATION_C);
 	}
 }
 
@@ -443,12 +458,28 @@ static ssize_t store_powersave_bias(struct dbs_data *dbs_data, const char *buf,
 	return count;
 }
 
+static ssize_t store_powersave_bias_threshold(struct dbs_data *dbs_data, const char *buf,
+		size_t count)
+{
+	struct od_dbs_tuners *od_tuners = dbs_data->tuners;
+	unsigned int input;
+	int ret;
+	ret = sscanf(buf, "%u", &input);
+
+	if (ret != 1)
+		return -EINVAL;
+
+	od_tuners->powersave_bias_threshold = input;
+	return count;
+}
+
 show_store_one(od, sampling_rate);
 show_store_one(od, io_is_busy);
 show_store_one(od, up_threshold);
 show_store_one(od, sampling_down_factor);
 show_store_one(od, ignore_nice_load);
 show_store_one(od, powersave_bias);
+show_store_one(od, powersave_bias_threshold);
 declare_show_sampling_rate_min(od);
 
 gov_sys_pol_attr_rw(sampling_rate);
@@ -457,6 +488,7 @@ gov_sys_pol_attr_rw(up_threshold);
 gov_sys_pol_attr_rw(sampling_down_factor);
 gov_sys_pol_attr_rw(ignore_nice_load);
 gov_sys_pol_attr_rw(powersave_bias);
+gov_sys_pol_attr_rw(powersave_bias_threshold);
 gov_sys_pol_attr_ro(sampling_rate_min);
 
 static struct attribute *dbs_attributes_gov_sys[] = {
@@ -467,6 +499,7 @@ static struct attribute *dbs_attributes_gov_sys[] = {
 	&ignore_nice_load_gov_sys.attr,
 	&powersave_bias_gov_sys.attr,
 	&io_is_busy_gov_sys.attr,
+	&powersave_bias_threshold_gov_sys.attr,
 	NULL
 };
 
@@ -483,6 +516,7 @@ static struct attribute *dbs_attributes_gov_pol[] = {
 	&ignore_nice_load_gov_pol.attr,
 	&powersave_bias_gov_pol.attr,
 	&io_is_busy_gov_pol.attr,
+	&powersave_bias_threshold_gov_pol.attr,
 	NULL
 };
 
@@ -528,6 +562,7 @@ static int od_init(struct dbs_data *dbs_data, bool notify)
 	tuners->sampling_down_factor = DEF_SAMPLING_DOWN_FACTOR;
 	tuners->ignore_nice_load = 0;
 	tuners->powersave_bias = default_powersave_bias;
+	tuners->powersave_bias_threshold = 0;
 	tuners->io_is_busy = should_io_be_busy();
 
 	dbs_data->tuners = tuners;
