@@ -458,6 +458,11 @@ depends on X86
 source "drivers/cpufreq/Kconfig.x86"
 endmenu
 
+menu "Intel Atom OverClocking And UnderClocking"
+depends on X86
+source "drivers/cpufreq/Kconfig.OC"
+endmenu
+
 menu "ARM CPU frequency scaling drivers"
 depends on ARM
 source "drivers/cpufreq/Kconfig.arm"

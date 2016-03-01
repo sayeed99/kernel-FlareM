@@ -98,9 +98,6 @@ static int sfi_cpufreq_num;
 static u32 sfi_cpu_num;
 static bool battlow;
 
-//#define CPU_ATOM_OVERCLOCK
-#define CPU_ATOM_UNDERCLOCK
-
 #define SFI_FREQ_MAX		32
 #define INTEL_MSR_RANGE		0xffff
 #define INTEL_MSR_BUSRATIO_MASK	0xff00
