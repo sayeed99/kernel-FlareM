@@ -24,7 +24,6 @@
 #include <linux/init.h>
 
 struct persistent_ram_buffer;
-struct persistent_ram_buffer_ctrl;
 struct rs_control;
 
 struct persistent_ram_ecc_info {
@@ -39,7 +38,6 @@ struct persistent_ram_zone {
 	size_t size;
 	void *vaddr;
 	struct persistent_ram_buffer *buffer;
-	struct persistent_ram_buffer_ctrl *buffer_ctrl;
 	size_t buffer_size;
 
 	/* ECC correction */
@@ -55,7 +53,8 @@ struct persistent_ram_zone {
 };
 
 struct persistent_ram_zone *persistent_ram_new(phys_addr_t start, size_t size,
-			u32 sig, struct persistent_ram_ecc_info *ecc_info);
+			u32 sig, struct persistent_ram_ecc_info *ecc_info,
+			unsigned int memtype);
 void persistent_ram_free(struct persistent_ram_zone *prz);
 void persistent_ram_zap(struct persistent_ram_zone *prz);
 
@@ -78,6 +77,7 @@ ssize_t persistent_ram_ecc_string(struct persistent_ram_zone *prz,
 struct ramoops_platform_data {
 	unsigned long	mem_size;
 	unsigned long	mem_address;
+	unsigned int	mem_type;
 	unsigned long	record_size;
 	unsigned long	console_size;
 	unsigned long	ftrace_size;

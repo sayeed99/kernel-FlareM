@@ -33,18 +33,6 @@ struct persistent_ram_buffer {
 	uint8_t     data[0];
 };
 
-/*
- * struct persistent_ram_buffer_ctrl
- *
- * This structure controls the offset where the pstore is written at, and its
- * size.  This structure must be in a cacheable memory area, so that atomic
- * accesses don't lock the RAM bus and trigger starvation.
- */
-struct persistent_ram_buffer_ctrl {
-	atomic_t    start;
-	atomic_t    size;
-};
-
 #define PERSISTENT_RAM_SIG (0x43474244) /* DBGC */
 
 static inline size_t buffer_size(struct persistent_ram_zone *prz)
@@ -61,19 +49,15 @@ static inline size_t buffer_start(struct persistent_ram_zone *prz)
 static size_t buffer_start_add_atomic(struct persistent_ram_zone *prz, size_t a)
 {
 	int old;
-	int cur;
 	int new;
 
-	cur = atomic_read(&prz->buffer_ctrl->start);
 	do {
-		old = cur;
+		old = atomic_read(&prz->buffer->start);
 		new = old + a;
 		while (unlikely(new > prz->buffer_size))
 			new -= prz->buffer_size;
-		cur = atomic_cmpxchg(&prz->buffer_ctrl->start, old, new);
-	} while (cur != old);
+	} while (atomic_cmpxchg(&prz->buffer->start, old, new) != old);
 
-	atomic_set(&prz->buffer->start, atomic_read(&prz->buffer_ctrl->start));
 	return old;
 }
 
@@ -81,22 +65,17 @@ static size_t buffer_start_add_atomic(struct persistent_ram_zone *prz, size_t a)
 static void buffer_size_add_atomic(struct persistent_ram_zone *prz, size_t a)
 {
 	size_t old;
-	size_t cur;
 	size_t new;
 
-	if (atomic_read(&prz->buffer_ctrl->size) == prz->buffer_size)
+	if (atomic_read(&prz->buffer->size) == prz->buffer_size)
 		return;
 
-	cur = atomic_read(&prz->buffer_ctrl->size);
 	do {
-		old = cur;
+		old = atomic_read(&prz->buffer->size);
 		new = old + a;
 		if (new > prz->buffer_size)
 			new = prz->buffer_size;
-		cur = atomic_cmpxchg(&prz->buffer_ctrl->size, old, new);
-	} while (cur != old);
-
-	atomic_set(&prz->buffer->size, atomic_read(&prz->buffer_ctrl->size));
+	} while (atomic_cmpxchg(&prz->buffer->size, old, new) != old);
 }
 
 static DEFINE_RAW_SPINLOCK(buffer_lock);
@@ -394,21 +373,15 @@ void persistent_ram_free_old(struct persistent_ram_zone *prz)
 	prz->old_log_size = 0;
 }
 
-void persistent_ram_sync_ctrl_buffer(struct persistent_ram_zone *prz)
-{
-	atomic_set(&prz->buffer_ctrl->start, atomic_read(&prz->buffer->start));
-	atomic_set(&prz->buffer_ctrl->size, atomic_read(&prz->buffer->size));
-}
-
 void persistent_ram_zap(struct persistent_ram_zone *prz)
 {
 	atomic_set(&prz->buffer->start, 0);
 	atomic_set(&prz->buffer->size, 0);
-	persistent_ram_sync_ctrl_buffer(prz);
 	persistent_ram_update_header_ecc(prz);
 }
 
-static void *persistent_ram_vmap(phys_addr_t start, size_t size)
+static void *persistent_ram_vmap(phys_addr_t start, size_t size,
+		unsigned int memtype)
 {
 	struct page **pages;
 	phys_addr_t page_start;
@@ -419,11 +392,12 @@ static void *persistent_ram_vmap(phys_addr_t start, size_t size)
 
 	page_start = start - offset_in_page(start);
 	page_count = DIV_ROUND_UP(size + offset_in_page(start), PAGE_SIZE);
-#ifdef CONFIG_X86_64
-	prot = pgprot_writecombine(PAGE_KERNEL);
-#else
-	prot = pgprot_noncached(PAGE_KERNEL);
-#endif
+
+	if (memtype)
+		prot = pgprot_noncached(PAGE_KERNEL);
+	else
+		prot = pgprot_writecombine(PAGE_KERNEL);
+
 	pages = kmalloc(sizeof(struct page *) * page_count, GFP_KERNEL);
 	if (!pages) {
 		pr_err("%s: Failed to allocate array for %u pages\n", __func__,
@@ -441,27 +415,38 @@ static void *persistent_ram_vmap(phys_addr_t start, size_t size)
 	return vaddr;
 }
 
-static void *persistent_ram_iomap(phys_addr_t start, size_t size)
+static void *persistent_ram_iomap(phys_addr_t start, size_t size,
+		unsigned int memtype)
 {
+	void *va;
+
 	if (!request_mem_region(start, size, "persistent_ram")) {
 		pr_err("request mem region (0x%llx@0x%llx) failed\n",
 			(unsigned long long)size, (unsigned long long)start);
 		return NULL;
 	}
 
-	return ioremap(start, size);
+	buffer_start_add = buffer_start_add_locked;
+	buffer_size_add = buffer_size_add_locked;
+
+	if (memtype)
+		va = ioremap(start, size);
+	else
+		va = ioremap_wc(start, size);
+
+	return va;
 }
 
 static int persistent_ram_buffer_map(phys_addr_t start, phys_addr_t size,
-		struct persistent_ram_zone *prz)
+		struct persistent_ram_zone *prz, int memtype)
 {
 	prz->paddr = start;
 	prz->size = size;
 
 	if (pfn_valid(start >> PAGE_SHIFT))
-		prz->vaddr = persistent_ram_vmap(start, size);
+		prz->vaddr = persistent_ram_vmap(start, size, memtype);
 	else
-		prz->vaddr = persistent_ram_iomap(start, size);
+		prz->vaddr = persistent_ram_iomap(start, size, memtype);
 
 	if (!prz->vaddr) {
 		pr_err("%s: Failed to map 0x%llx pages at 0x%llx\n", __func__,
@@ -478,18 +463,11 @@ static int persistent_ram_buffer_map(phys_addr_t start, phys_addr_t size,
 static int persistent_ram_post_init(struct persistent_ram_zone *prz, u32 sig,
 				    struct persistent_ram_ecc_info *ecc_info)
 {
-	int ret = -ENOMEM;
-
-	prz->buffer_ctrl = kmalloc(sizeof(struct persistent_ram_buffer_ctrl), GFP_KERNEL);
-	if (!prz->buffer_ctrl) {
-		pr_err("persistent_ram_post_init: failed to allocate persistent ram control buffer\n");
-		goto err;
-	}
-	persistent_ram_sync_ctrl_buffer(prz);
+	int ret;
 
 	ret = persistent_ram_init_ecc(prz, ecc_info);
 	if (ret)
-		goto err;
+		return ret;
 
 	sig ^= PERSISTENT_RAM_SIG;
 
@@ -515,9 +493,6 @@ static int persistent_ram_post_init(struct persistent_ram_zone *prz, u32 sig,
 	persistent_ram_zap(prz);
 
 	return 0;
-err:
-	kfree(prz->buffer_ctrl);
-	return ret;
 }
 
 void persistent_ram_free(struct persistent_ram_zone *prz)
@@ -535,12 +510,12 @@ void persistent_ram_free(struct persistent_ram_zone *prz)
 		prz->vaddr = NULL;
 	}
 	persistent_ram_free_old(prz);
-	kfree(prz->buffer_ctrl);
 	kfree(prz);
 }
 
 struct persistent_ram_zone *persistent_ram_new(phys_addr_t start, size_t size,
-			u32 sig, struct persistent_ram_ecc_info *ecc_info)
+			u32 sig, struct persistent_ram_ecc_info *ecc_info,
+			unsigned int memtype)
 {
 	struct persistent_ram_zone *prz;
 	int ret = -ENOMEM;
@@ -551,7 +526,7 @@ struct persistent_ram_zone *persistent_ram_new(phys_addr_t start, size_t size,
 		goto err;
 	}
 
-	ret = persistent_ram_buffer_map(start, size, prz);
+	ret = persistent_ram_buffer_map(start, size, prz, memtype);
 	if (ret)
 		goto err;
 

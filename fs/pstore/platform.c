@@ -206,7 +206,7 @@ static void pstore_console_write(struct console *con, const char *s, unsigned c)
 static struct console pstore_console = {
 	.name	= "pstore",
 	.write	= pstore_console_write,
-	.flags	= CON_PRINTBUFFER | CON_ENABLED | CON_ANYTIME | CON_IGNORELEVEL,
+	.flags	= CON_PRINTBUFFER | CON_ENABLED | CON_ANYTIME,
 	.index	= -1,
 };
 
@@ -267,7 +267,6 @@ int pstore_register(struct pstore_info *psi)
 	kmsg_dump_register(&pstore_dumper);
 	pstore_register_console();
 	pstore_register_ftrace();
-	pstore_register_pmsg();
 
 	if (pstore_update_ms >= 0) {
 		pstore_timer.expires = jiffies +

@@ -335,14 +335,6 @@ static void extent_crypt_complete(struct crypto_async_request *req, int rc)
 	complete(&ecr->completion);
 }
 
-static inline u8 *crypt_stat_get_key(struct ecryptfs_crypt_stat *crypt_stat)
-{
-	u8 *key = crypt_stat->key;
-	if (crypt_stat->mount_crypt_stat->flags & ECRYPTFS_HARDWARE_KEY)
-		key = (u8 *)&crypt_stat->mount_crypt_stat->hardware_key_id;
-	return key;
-}
-
 /**
  * encrypt_scatterlist
  * @crypt_stat: Pointer to the crypt_stat struct to initialize.
@@ -386,8 +378,7 @@ static int encrypt_scatterlist(struct ecryptfs_crypt_stat *crypt_stat,
 			extent_crypt_complete, &ecr);
 	/* Consider doing this once, when the file is opened */
 	if (!(crypt_stat->flags & ECRYPTFS_KEY_SET)) {
-		u8 *key = crypt_stat_get_key(crypt_stat);
-		rc = crypto_ablkcipher_setkey(crypt_stat->tfm, key,
+		rc = crypto_ablkcipher_setkey(crypt_stat->tfm, crypt_stat->key,
 					      crypt_stat->key_size);
 		if (rc) {
 			ecryptfs_printk(KERN_ERR,
@@ -697,8 +688,7 @@ static int decrypt_scatterlist(struct ecryptfs_crypt_stat *crypt_stat,
 			extent_crypt_complete, &ecr);
 	/* Consider doing this once, when the file is opened */
 	if (!(crypt_stat->flags & ECRYPTFS_KEY_SET)) {
-		u8 *key = crypt_stat_get_key(crypt_stat);
-		rc = crypto_ablkcipher_setkey(crypt_stat->tfm, key,
+		rc = crypto_ablkcipher_setkey(crypt_stat->tfm, crypt_stat->key,
 					      crypt_stat->key_size);
 		if (rc) {
 			ecryptfs_printk(KERN_ERR,
@@ -799,7 +789,6 @@ int ecryptfs_init_crypt_ctx(struct ecryptfs_crypt_stat *crypt_stat)
 {
 	char *full_alg_name;
 	int rc = -EINVAL;
-	char *mode = "cbc";
 
 	if (!crypt_stat->cipher) {
 		ecryptfs_printk(KERN_ERR, "No cipher specified\n");
@@ -814,13 +803,9 @@ int ecryptfs_init_crypt_ctx(struct ecryptfs_crypt_stat *crypt_stat)
 		rc = 0;
 		goto out;
 	}
-
-	if (crypt_stat->mount_crypt_stat->flags & ECRYPTFS_HARDWARE_KEY)
-		mode = "cbchk";
-
 	mutex_lock(&crypt_stat->cs_tfm_mutex);
 	rc = ecryptfs_crypto_api_algify_cipher_name(&full_alg_name,
-						    crypt_stat->cipher, mode);
+						    crypt_stat->cipher, "cbc");
 	if (rc)
 		goto out_unlock;
 	crypt_stat->tfm = crypto_alloc_ablkcipher(full_alg_name, 0, 0);
@@ -1038,10 +1023,8 @@ int ecryptfs_new_file_context(struct inode *ecryptfs_inode)
 		       "to the inode key sigs; rc = [%d]\n", rc);
 		goto out;
 	}
-	/* TODO: Investigate side effect of truncating name if too long */
 	cipher_name_len =
-		min(strlen(mount_crypt_stat->global_default_cipher_name),
-		    sizeof(crypt_stat->cipher)-1);
+		strlen(mount_crypt_stat->global_default_cipher_name);
 	memcpy(crypt_stat->cipher,
 	       mount_crypt_stat->global_default_cipher_name,
 	       cipher_name_len);
