@@ -3,6 +3,8 @@ clear
 start=`date +%s`
 echo "script made by eoghan2t7 of xda"
 printf "say thanks to him if this helped you :) \n\n"
+echo "kernel source is based on FlareM kernel by say99 of xda"
+printf "say thanks to him if this helped you :) \n\n"
 wmctrl -r :ACTIVE: -N "Applying Build Settings"
 NOW=$(date +"%d-%m-%Y")
 echo "Current Date : $NOW"
@@ -19,7 +21,7 @@ echo "Setting Extra Version"
 export EV=EXTRAVERSION=_KaliZen_v$1
 echo "Setting Defconfig"
 export DEFCONFIG=kali_zenfone2_defconfig
-echo "Setting bzImage Location For FlareM kernel By say99 Of XDA (thanks to eoghan2t7)"
+echo "Setting bzImage Location For KaliZen kernel By miradli Of XDA (thanks to @say99 and eoghan2t7)"
 export BZIMAGE=arch/x86/boot/bzImage
 echo "Enabling Graphite Optimizations"
 export ENABLE_GRAPHITE=true
@@ -44,7 +46,7 @@ else
    make $DEFCONFIG
    sleep $SLEEP
 fi
-wmctrl -r :ACTIVE: -N "Compiling FlareM Kernel"
+wmctrl -r :ACTIVE: -N "Compiling KaliZen Kernel"
 make $EV -j$CPUS
 
 if [ -f $BZIMAGE ];
@@ -70,7 +72,7 @@ echo "Starting Build Process  : done"
 echo "Build complete"
 
 #Kernel Packing
-wmctrl -r :ACTIVE: -N "FlareM Kernel Packing"
+wmctrl -r :ACTIVE: -N "KaliZen Kernel Packing"
 echo "Starting Packing To Recovery Flashable Zip"
 cd out/
 echo "Removing Old Files"
