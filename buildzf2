@@ -16,9 +16,9 @@ export CPUS=`nproc`
 echo "Setting Version Number"
 export VER=$1
 echo "Setting Extra Version"
-export EV=EXTRAVERSION=_FlareM_v$1
+export EV=EXTRAVERSION=_KaliZen_v$1
 echo "Setting Defconfig"
-export DEFCONFIG=cyanogenmod_zenfone2_defconfig
+export DEFCONFIG=kali_zenfone2_defconfig
 echo "Setting bzImage Location For FlareM kernel By say99 Of XDA (thanks to eoghan2t7)"
 export BZIMAGE=arch/x86/boot/bzImage
 echo "Enabling Graphite Optimizations"
@@ -80,7 +80,7 @@ echo "Copying bzImage"
 mv ../arch/x86/boot/bzImage bzImage
 sleep $SLEEP
 echo "Compiling FlareM_"$VER".zip"
-find . -type f -exec zip FlareM_"$VER".zip {} +
+find . -type f -exec zip KaliZen_"$VER".zip {} +
 nowf=$(date +"%T")
 cd ..
 make clean
