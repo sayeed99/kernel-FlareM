@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86_64 3.10.96 Kernel Configuration
+# Linux/x86_64 3.10.99 Kernel Configuration
 #
 CONFIG_64BIT=y
 CONFIG_X86_64=y
@@ -587,7 +587,7 @@ CONFIG_CPU_FREQ_GOV_INTEL=y
 #
 # x86 CPU frequency scaling drivers
 #
-CONFIG_X86_INTEL_PSTATE is not set
+# CONFIG_X86_INTEL_PSTATE is not set
 CONFIG_X86_SFI_CPUFREQ=y
 # CONFIG_X86_P4_CLOCKMOD is not set
 
@@ -1387,6 +1387,7 @@ CONFIG_SLHC=y
 # CONFIG_USB_CATC is not set
 # CONFIG_USB_KAWETH is not set
 # CONFIG_USB_PEGASUS is not set
+CONFIG_USB_QF9700=y
 CONFIG_USB_RTL8150=y
 CONFIG_USB_RTL8152=y
 CONFIG_USB_USBNET=y
