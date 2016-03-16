@@ -1,0 +1,11 @@
+config CPU_ATOM_OVERCLOCK
+	bool "Enable CPU Overclocking option"
+	default n
+	help
+	  atom overclocking up to 2.5 GHz
+
+config CPU_ATOM_UNDERCLOCK
+	bool "Enable CPU Underclocking option"
+	default n
+	help
+	  atom underclocking to 333 MHz

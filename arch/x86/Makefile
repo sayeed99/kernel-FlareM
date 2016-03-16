@@ -96,8 +96,11 @@ else
                 $(call cc-option,-march=skylake,$(call cc-option,-mtune=skylake))
         cflags-$(CONFIG_MATOM) += $(call cc-option,-march=bonnell) \
                 $(call cc-option,-mtune=bonnell,$(call cc-option,-mtune=generic))
-        cflags-$(CONFIG_MSLM) += $(call cc-option,-march=slm) \
-                $(call cc-option,-mtune=slm,$(call cc-option,-mtune=generic))
+        cflags-$(CONFIG_MSLM) += $(call cc-option,-march=silvermont) \
+                $(call cc-option,-mtune=silvermont,$(call cc-option,-mtune=silvermont)) \
+		--param l1-cache-line-size=64 \
+		--param l1-cache-size=32 \
+		--param l2-cache-size=1024 
         cflags-$(CONFIG_GENERIC_CPU) += $(call cc-option,-mtune=generic)
         KBUILD_CFLAGS += $(cflags-y)
 

@@ -433,6 +433,9 @@ extern struct cpufreq_governor cpufreq_gov_darkness;
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_HOTPLUG)
 extern struct cpufreq_governor cpufreq_gov_hotplug;
 #define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_hotplug)
+#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_intel)
+extern struct cpufreq_governor cpufreq_gov_intel;
+#define CPUFREQ_DEFAULT_GOVERNOR	(&cpufreq_gov_intel)
 #endif
 
 /*********************************************************************
@@ -471,6 +474,8 @@ void cpufreq_frequency_table_get_attr(struct cpufreq_frequency_table *table,
 void cpufreq_frequency_table_update_policy_cpu(struct cpufreq_policy *policy);
 
 void cpufreq_frequency_table_put_attr(unsigned int cpu);
+
+void set_cpufreq_boost(unsigned long val);
 
 /*********************************************************************
  *                         CPUFREQ STATS                             *

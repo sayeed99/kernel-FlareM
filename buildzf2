@@ -14,17 +14,32 @@ export SLEEP=1
 echo "Setting CPU Cores/Threads"
 export CPUS=`nproc`
 echo "Setting Version Number"
-export VER=$1
+export VER=v$1
 echo "Setting Extra Version"
 export EV=EXTRAVERSION=_FlareM_v$1
+if [ -z "$2" ]
+  then
+    NH="na"
+else
+   NH=$2
+fi
+if [ -n "$2" ]
+then
+ if [ $NH == "NH" ]
+  then
+echo "Setting Defconfig"
+export DEFCONFIG=kali_zenfone2_defconfig
+rm -rf .config
+echo "building for NetHunter"
+ fi
+else
 echo "Setting Defconfig"
 export DEFCONFIG=cyanogenmod_zenfone2_defconfig
+fi
 echo "Setting bzImage Location For FlareM kernel By say99 Of XDA (thanks to eoghan2t7)"
 export BZIMAGE=arch/x86/boot/bzImage
 echo "Enabling Graphite Optimizations"
 export ENABLE_GRAPHITE=true
-echo "Set KBUILD_BUILD_VERSION to zero at all times"
-export KBUILD_BUILD_VERSION="0"
 echo "Enviroment Setup Complete Now Moving To Compiling"
 
 #Build
